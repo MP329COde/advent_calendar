@@ -1,2 +1,6 @@
 front/node_modules
 back/node_modules
+back/*.db
+.env
+front/.env
+back/.env
