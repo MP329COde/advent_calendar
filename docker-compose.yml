@@ -8,9 +8,8 @@ services:
       - "3001:3001"
     environment:
       PORT: 3001
-      DB_PATH: /app/data/data.db
-    volumes:
-      - back_data:/app/data
+   volumes:
+      - back_data:/app/database.db
 
   front:
     build:
