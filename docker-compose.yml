@@ -1,0 +1,26 @@
+services:
+  back:
+    build:
+      context: ./back
+    container_name: advent_calendar_back
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      DB_PATH: /app/data/data.db
+    volumes:
+      - back_data:/app/data
+
+  front:
+    build:
+      context: ./front
+    container_name: advent_calendar_front
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - back
+
+volumes:
+  back_data:
