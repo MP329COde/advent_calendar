@@ -25,13 +25,13 @@ spec:
     spec:
       containers:
         - name: back
-          image: advent_calendar-back:latest
+          image: ghcr.io/mp329code/advent_calendar-back:latest
           ports:
             - containerPort: 3001
           env:
             - name: PORT
               value: "3001"
-            volumeMounts:
+          volumeMounts:
             - name: data
               mountPath: /app/database.db
               subPath: database.db
@@ -67,7 +67,7 @@ spec:
     spec:
       containers:
         - name: front
-          image: advent_calendar-front:latest
+          image: ghcr.io/mp329code/advent_calendar-front:latest
           ports:
             - containerPort: 80
           env:
