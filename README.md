@@ -15,7 +15,7 @@ advent_calendar/
 
 1. **Créer une issue** à partir du template "Jour du calendrier" (onglet *Issues* → *New issue*), en précisant le numéro du jour et l'objectif du défi.
 2. **Créer une branche** dédiée depuis `main` : `jour-XX-description` (ex. `jour-03-formulaire-contact`).
-3. **Développer** la fonctionnalité côté `front/` et/ou `back/` selon le besoin.
+3. **Développerx** la fonctionnalité côté `front/` et/ou `back/` selon le besoin.
 4. **Ouvrir une pull request** vers `main` avec le template fourni, en liant l'issue correspondante (`Closes #XX`).
 5. **Vérifier que la CI passe** (lint + build) avant de merger.
 
