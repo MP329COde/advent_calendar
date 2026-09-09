@@ -29,3 +29,11 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 3
+    ignore:
+      # better-sqlite3 doit compiler nativement (node-gyp) contre l'API V8 de
+      # l'image de base : ne pas monter en majeure automatiquement, car une
+      # nouvelle version majeure de Node peut casser la compilation avant que
+      # better-sqlite3 ne publie des binaires precompiles compatibles
+      # (cf. echec du build avec node:26-bookworm-slim).
+      - dependency-name: "node"
+        update-types: ["version-update:semver-major"]
