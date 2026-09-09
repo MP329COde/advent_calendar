@@ -6,39 +6,31 @@ test.describe('Page d\'accueil', () => {
   });
 
   test('affiche le titre de la page', async ({ page }) => {
-    await expect(page).toHaveTitle(/front/i);
+    await expect(page).toHaveTitle(/Calendrier de l'Avent/i);
   });
 
-  test('affiche le titre principal "Get started"', async ({ page }) => {
+  test('affiche le titre principal du calendrier', async ({ page }) => {
     await expect(
-      page.getByRole('heading', { name: 'Get started' })
+      page.getByRole('heading', { name: "Calendrier de l'Avent" })
     ).toBeVisible();
   });
 
-  test('incrémente le compteur à chaque clic sur le bouton', async ({ page }) => {
-    const button = page.getByRole('button', { name: /Count is/ });
-    await expect(button).toHaveText('Count is 0');
-
-    await button.click();
-    await expect(button).toHaveText('Count is 1');
-
-    await button.click();
-    await expect(button).toHaveText('Count is 2');
+  test('affiche les 24 cases du calendrier', async ({ page }) => {
+    await expect(page.getByLabel(/^Jour \d+,/)).toHaveCount(24);
   });
 
-  test('affiche les liens vers la documentation Vite et React', async ({ page }) => {
+  test('affiche le lien vers le dépôt GitHub dans le pied de page', async ({
+    page,
+  }) => {
     await expect(
-      page.getByRole('link', { name: /Explore Vite/i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: /Learn more/i })
+      page.getByRole('link', { name: /Voir le projet sur GitHub/i })
     ).toBeVisible();
   });
 
-  test('affiche les liens de la communauté (GitHub, Discord, X, Bluesky)', async ({ page }) => {
-    await expect(page.getByRole('link', { name: /^GitHub$/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /^Discord$/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /^X\.com$/ })).toBeVisible();
-    await expect(page.getByRole('link', { name: /^Bluesky$/ })).toBeVisible();
+  test('affiche une page 404 pour une route inconnue', async ({ page }) => {
+    await page.goto('/une-route-qui-nexiste-pas');
+    await expect(
+      page.getByRole('heading', { name: 'Page introuvable' })
+    ).toBeVisible();
   });
 });
