@@ -1,0 +1,23 @@
+services:
+  back:
+    image: ghcr.io/mp329code/advent_calendar-back:latest
+    container_name: advent_calendar_back
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+    volumes:
+      - back_data:/app/database.db
+
+  front:
+    image: ghcr.io/mp329code/advent_calendar-front:latest
+    container_name: advent_calendar_front
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    depends_on:
+      - back
+
+volumes:
+  back_data:

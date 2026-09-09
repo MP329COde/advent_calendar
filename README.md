@@ -2,15 +2,33 @@
 
 Application "calendrier de l'avent" : un défi / mini-projet par jour, du 1er au 24 décembre.
 
+## Démarrage rapide (sans cloner le dépôt)
+
+Les images `front` et `back` sont publiées publiquement sur GitHub Container Registry : il n'y a rien à builder, seul Docker (avec le plugin Compose) est nécessaire.
+
+```bash
+curl -O https://raw.githubusercontent.com/MP329COde/advent_calendar/main/docker-compose.prod.yml
+docker compose -f docker-compose.prod.yml up -d
+```
+
+- Le front est accessible sur http://localhost:8080
+- Le back est exposé sur http://localhost:3001
+- La base SQLite du back (`database.db`) est conservée entre les redémarrages grâce au volume Docker `back_data`
+
+Pour tout arrêter : `docker compose -f docker-compose.prod.yml down` (ajouter `-v` pour aussi supprimer les données).
+
+Pour développer sur le projet (avec le code source, hot-reload, etc.), voir les sections suivantes.
+
 ## Structure du dépôt
 
 ```
 advent_calendar/
-├── back/               # API backend (Express + Node.js + better-sqlite3)
-├── front/              # Application front (React + Vite)
-├── k8s/                # Manifestes Kubernetes (déploiement alternatif à Docker Compose)
-├── docker-compose.yml  # Lance front + back ensemble en local ou sur un serveur
-└── .github/            # Workflows CI/CD, Dependabot, templates d'issues et de pull requests
+├── back/                   # API backend (Express + Node.js + better-sqlite3)
+├── front/                  # Application front (React + Vite)
+├── k8s/                    # Manifestes Kubernetes (déploiement alternatif à Docker Compose)
+├── docker-compose.yml      # Build front + back localement à partir du code source
+├── docker-compose.prod.yml # Lance front + back à partir des images publiées sur GHCR (aucun build)
+└── .github/                # Workflows CI/CD, Dependabot, templates d'issues et de pull requests
 ```
 
 ## Trame à suivre pour chaque jour
@@ -49,7 +67,7 @@ npm run dev
 
 ## Déploiement avec Docker Compose
 
-Lance le front et le back ensemble en une seule commande, à la racine du dépôt :
+Lance le front et le back ensemble en une seule commande, à la racine du dépôt (build à partir du code source) :
 
 ```bash
 docker compose up --build -d
@@ -71,11 +89,13 @@ Pour arrêter et supprimer aussi les données de la base :
 docker compose down -v
 ```
 
+> Pour lancer l'application sans builder les images (à partir des images déjà publiées sur GHCR), voir la section [Démarrage rapide](#démarrage-rapide-sans-cloner-le-dépôt) ci-dessus, qui utilise `docker-compose.prod.yml`.
+
 ## Registre d'images Docker (GitHub Container Registry)
 
 Le workflow `.github/workflows/docker-publish.yml` construit et publie automatiquement les images Docker du `front` et du `back` sur le [GitHub Container Registry (GHCR)](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry) à chaque push sur `main` (ainsi que sur les tags `v*.*.*`), en utilisant le `GITHUB_TOKEN` fourni automatiquement par GitHub Actions (aucun secret à configurer).
 
-Images publiées :
+Images publiées (visibilité **publique**, `docker pull` fonctionne sans authentification) :
 
 - `ghcr.io/mp329code/advent_calendar-back`
 - `ghcr.io/mp329code/advent_calendar-front`
@@ -89,7 +109,7 @@ docker pull ghcr.io/mp329code/advent_calendar-back:latest
 docker pull ghcr.io/mp329code/advent_calendar-front:latest
 ```
 
-**Visibilité du package** : par défaut, un package publié via `GITHUB_TOKEN` est privé. Pour permettre un `docker pull` sans authentification (ou depuis un cluster Kubernetes externe), rendre le package public une fois : onglet *Packages* du dépôt → sélectionner le package → *Package settings* → *Change visibility* → *Public*. Si le package reste privé, créer un [Personal Access Token avec le scope `read:packages`](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) et se connecter avec `docker login ghcr.io -u <utilisateur> -p <token>` (ou un `imagePullSecret` côté Kubernetes).
+Si la visibilité du package venait à être repassée en privé (onglet *Packages* du dépôt → sélectionner le package → *Package settings* → *Change visibility*), il faudrait alors créer un [Personal Access Token avec le scope `read:packages`](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) et se connecter avec `docker login ghcr.io -u <utilisateur> -p <token>` (ou un `imagePullSecret` côté Kubernetes).
 
 ## Déploiement avec Kubernetes
 
@@ -99,7 +119,7 @@ Les manifestes se trouvent dans `k8s/advent-calendar.yaml` (PersistentVolumeClai
 kubectl apply -f k8s/advent-calendar.yaml
 ```
 
-Si le package GHCR est privé, ajouter un `imagePullSecrets` dans les Deployments pointant vers un secret Kubernetes créé avec :
+Les images GHCR étant publiques, aucun `imagePullSecrets` n'est nécessaire. Si la visibilité du package était repassée en privé, ajouter un `imagePullSecrets` dans les Deployments pointant vers un secret Kubernetes créé avec :
 
 ```bash
 kubectl create secret docker-registry ghcr-pull-secret \
