@@ -31,11 +31,10 @@ spec:
           env:
             - name: PORT
               value: "3001"
-            - name: DB_PATH
-              value: /app/data/data.db
-          volumeMounts:
+            volumeMounts:
             - name: data
-              mountPath: /app/data
+              mountPath: /app/database.db
+              subPath: database.db
       volumes:
         - name: data
           persistentVolumeClaim:
