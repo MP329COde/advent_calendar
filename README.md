@@ -71,12 +71,41 @@ Pour arrêter et supprimer aussi les données de la base :
 docker compose down -v
 ```
 
+## Registre d'images Docker (GitHub Container Registry)
+
+Le workflow `.github/workflows/docker-publish.yml` construit et publie automatiquement les images Docker du `front` et du `back` sur le [GitHub Container Registry (GHCR)](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry) à chaque push sur `main` (ainsi que sur les tags `v*.*.*`), en utilisant le `GITHUB_TOKEN` fourni automatiquement par GitHub Actions (aucun secret à configurer).
+
+Images publiées :
+
+- `ghcr.io/mp329code/advent_calendar-back`
+- `ghcr.io/mp329code/advent_calendar-front`
+
+Tags générés automatiquement : `latest` (sur `main`), le nom de la branche, le SHA court du commit, et la version sémantique en cas de tag `vX.Y.Z`.
+
+Récupérer une image en local :
+
+```bash
+docker pull ghcr.io/mp329code/advent_calendar-back:latest
+docker pull ghcr.io/mp329code/advent_calendar-front:latest
+```
+
+**Visibilité du package** : par défaut, un package publié via `GITHUB_TOKEN` est privé. Pour permettre un `docker pull` sans authentification (ou depuis un cluster Kubernetes externe), rendre le package public une fois : onglet *Packages* du dépôt → sélectionner le package → *Package settings* → *Change visibility* → *Public*. Si le package reste privé, créer un [Personal Access Token avec le scope `read:packages`](https://docs.github.com/fr/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry) et se connecter avec `docker login ghcr.io -u <utilisateur> -p <token>` (ou un `imagePullSecret` côté Kubernetes).
+
 ## Déploiement avec Kubernetes
 
-Les manifestes se trouvent dans `k8s/advent-calendar.yaml` (PersistentVolumeClaim, Deployments et Services pour le front et le back). Après avoir construit et poussé les images (`advent_calendar-back` et `advent_calendar-front`) vers un registre accessible par le cluster :
+Les manifestes se trouvent dans `k8s/advent-calendar.yaml` (PersistentVolumeClaim, Deployments et Services pour le front et le back). Les images utilisées pointent vers GHCR (`ghcr.io/mp329code/advent_calendar-back` et `ghcr.io/mp329code/advent_calendar-front`), publiées automatiquement par le workflow `docker-publish.yml` :
 
 ```bash
 kubectl apply -f k8s/advent-calendar.yaml
+```
+
+Si le package GHCR est privé, ajouter un `imagePullSecrets` dans les Deployments pointant vers un secret Kubernetes créé avec :
+
+```bash
+kubectl create secret docker-registry ghcr-pull-secret \
+  --docker-server=ghcr.io \
+  --docker-username=<utilisateur> \
+  --docker-password=<token avec le scope read:packages>
 ```
 
 Le service `advent-front` est de type `LoadBalancer` : selon le cluster, une IP externe sera attribuée automatiquement (ou utiliser `kubectl port-forward` en local avec Minikube/Kind).
@@ -90,5 +119,6 @@ Le service `advent-front` est de type `LoadBalancer` : selon le cluster, une IP 
 
 ## CI/CD et mises à jour automatiques
 
-- Le workflow `.github/workflows/ci.yml` lint et build automatiquement le `front` et installe/teste le `back` à chaque push et pull request sur `main`.
+- Le workflow `.github/workflows/ci.yml` lint et build automatiquement le `front`, installe/teste le `back`, et exécute les tests end-to-end Playwright du `front` à chaque push et pull request sur `main`.
+- Le workflow `.github/workflows/docker-publish.yml` construit et publie les images Docker du `front` et du `back` sur GHCR à chaque push sur `main` (voir la section [Registre d'images Docker](#registre-dimages-docker-github-container-registry)).
 - **Dependabot** (`.github/dependabot.yml`) ouvre automatiquement une pull request chaque semaine dès qu'une dépendance npm, une image Docker ou une action GitHub peut être mise à jour. Vérifier régulièrement l'onglet *Pull requests* et les fusionner après relecture (la CI doit être verte).
