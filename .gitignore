@@ -5,3 +5,4 @@ back/data
 .env
 front/.env
 back/.env
+front/.playwright-cli
