@@ -1,16 +1,32 @@
+import { useEffect, useState } from 'react'
 import useDocumentTitle from '../../hooks/useDocumentTitle'
 import './Home.css'
 
-const DAYS = Array.from({ length: 24 }, (_, index) => index + 1)
-
-function isDayUnlocked(day) {
-  const today = new Date()
-  const isDecember = today.getMonth() === 11
-  return isDecember && day <= today.getDate()
-}
-
 function Home() {
   useDocumentTitle()
+
+  const [days, setDays] = useState([])
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    fetch('/api/days')
+      .then((res) => {
+        if (!res.ok) throw new Error('Erreur lors du chargement du calendrier')
+        return res.json()
+      })
+      .then((data) => {
+        if (!cancelled) setDays(data)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className="home">
@@ -22,30 +38,33 @@ function Home() {
         </p>
       </section>
 
+      {error && (
+        <p role="alert" className="home__error">
+          {error}
+        </p>
+      )}
+
       <section className="home__grid" aria-label="Cases du calendrier">
-        {DAYS.map((day) => {
-          const unlocked = isDayUnlocked(day)
-          return (
-            <div
-              key={day}
-              className={
-                unlocked ? 'day-card day-card--unlocked' : 'day-card'
-              }
-              aria-label={
-                unlocked
-                  ? `Jour ${day}, débloqué`
-                  : `Jour ${day}, verrouillé`
-              }
-            >
-              <span className="text-calendar-number">{day}</span>
-              {!unlocked && (
-                <span className="day-card__lock" aria-hidden="true">
-                  🔒
-                </span>
-              )}
-            </div>
-          )
-        })}
+        {days.map(({ day, unlocked, title }) => (
+          <div
+            key={day}
+            className={
+              unlocked ? 'day-card day-card--unlocked' : 'day-card'
+            }
+            aria-label={
+              unlocked
+                ? `Jour ${day}, débloqué${title ? `, ${title}` : ''}`
+                : `Jour ${day}, verrouillé`
+            }
+          >
+            <span className="text-calendar-number">{day}</span>
+            {!unlocked && (
+              <span className="day-card__lock" aria-hidden="true">
+                🔒
+              </span>
+            )}
+          </div>
+        ))}
       </section>
     </div>
   )
