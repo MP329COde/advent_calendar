@@ -14,3 +14,28 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Tests end-to-end (Playwright)
+
+Les tests e2e vivent dans `e2e/` et sont exécutés avec [Playwright](https://playwright.dev/).
+
+Installation locale (une fois) :
+
+```bash
+npm install -D @playwright/test
+npx playwright install --with-deps chromium
+```
+
+Lancer les tests (construit l'app puis démarre un serveur de preview automatiquement) :
+
+```bash
+npm run test:e2e
+```
+
+Mode interactif (UI) :
+
+```bash
+npm run test:e2e:ui
+```
+
+La CI (job `Front - Playwright e2e`) exécute ces mêmes tests à chaque push et pull request sur `main`.
