@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../../../theme/useTheme'
+import { loadDesigns } from '../../../designs/loadDesigns'
+
+const AVAILABLE_DESIGNS = loadDesigns()
 
 const COLOR_LABELS = {
   primary: 'Primaire',
@@ -17,6 +20,7 @@ function ThemeManager() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [busySlug, setBusySlug] = useState(null)
+  const [importingDesign, setImportingDesign] = useState(null)
 
   async function loadThemes() {
     try {
@@ -107,6 +111,39 @@ function ThemeManager() {
     }
   }
 
+  async function importDesign(design) {
+    setImportingDesign(design.folder)
+    setError(null)
+    try {
+      const themeRes = await fetch('/api/themes', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: design.name,
+          description: design.description,
+          config: design.config,
+        }),
+      })
+      if (!themeRes.ok) throw new Error((await themeRes.json()).error)
+
+      if (design.branding) {
+        await fetch('/api/branding', {
+          method: 'PUT',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(design.branding),
+        })
+      }
+
+      await loadThemes()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setImportingDesign(null)
+    }
+  }
+
   if (loading) return <p>Chargement des thèmes…</p>
 
   return (
@@ -123,6 +160,34 @@ function ThemeManager() {
         <input name="name" type="text" placeholder="Nom du nouveau thème" required />
         <button type="submit">Créer un thème</button>
       </form>
+
+      {AVAILABLE_DESIGNS.length > 0 && (
+        <div className="admin-design-library">
+          <h3>Bibliothèque de designs</h3>
+          <p className="admin-section__hint">
+            Designs déposés dans <code>front/src/designs/</code>. Importer une copie crée un
+            nouveau thème (et met à jour le branding si le design en définit un).
+          </p>
+          <div className="admin-design-grid">
+            {AVAILABLE_DESIGNS.map((design) => (
+              <div key={design.folder} className="admin-design-card">
+                {design.branding?.logoUrl && (
+                  <img className="admin-design-card__logo" src={design.branding.logoUrl} alt="" />
+                )}
+                <h4>{design.name}</h4>
+                {design.description && <p>{design.description}</p>}
+                <button
+                  type="button"
+                  onClick={() => importDesign(design)}
+                  disabled={importingDesign === design.folder}
+                >
+                  {importingDesign === design.folder ? 'Import…' : 'Importer comme thème'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="admin-theme-grid">
         {themes.map((theme) => {
