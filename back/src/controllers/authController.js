@@ -105,7 +105,7 @@ export function me(req, res) {
   const user = resolveSessionUser(req.cookies?.[SESSION_COOKIE]);
 
   if (!user) {
-    return res.status(401).json({ error: 'Non authentifié' });
+    return res.json(null);
   }
 
   return res.json(user);

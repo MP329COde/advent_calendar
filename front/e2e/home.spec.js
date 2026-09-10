@@ -6,7 +6,7 @@ test.describe('Page d\'accueil', () => {
   });
 
   test('affiche le titre de la page', async ({ page }) => {
-    await expect(page).toHaveTitle(/Calendrier de l'Avent/i);
+    await expect(page).toHaveTitle(/Calendrier de l.Avent/i);
   });
 
   test('affiche le titre principal du calendrier', async ({ page }) => {

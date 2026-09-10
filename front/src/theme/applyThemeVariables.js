@@ -30,10 +30,6 @@ export function applyThemeVariables({ branding, theme } = {}) {
     }
   }
 
-  if (branding?.platformName) {
-    document.title = branding.platformName
-  }
-
   updateFavicon(branding?.faviconUrl)
 }
 

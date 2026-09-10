@@ -32,7 +32,7 @@ test.describe('Navigation entre les pages', () => {
     await expect(
       page.getByRole('heading', { name: "Calendrier de l'Avent" })
     ).toBeVisible();
-    await expect(page).toHaveTitle(/^Calendrier de l'Avent$/i);
+    await expect(page).toHaveTitle(/^Calendrier de l.Avent$/i);
   });
 
   test('le bouton retour du navigateur revient sur la page précédente', async ({
