@@ -1,12 +1,13 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// Config dédiée à l'assistant de configuration initiale (/setup).
+// Config dédiée aux parcours qui dialoguent en continu avec l'API réelle
+// (assistant de configuration initiale, authentification, tableau de bord admin).
 // Contrairement à playwright.config.js (build + preview statique, sans proxy API),
 // ce fichier cible le serveur de dev Vite, dont le proxy `/api` redirige vers le
-// backend Express — nécessaire puisque l'assistant dialogue en continu avec l'API.
+// backend Express.
 export default defineConfig({
   testDir: './e2e',
-  testMatch: /setup\.spec\.js/,
+  testMatch: /(setup|login|admin)\.spec\.js/,
   fullyParallel: false,
   workers: 1,
   forbidOnly: !!process.env.CI,

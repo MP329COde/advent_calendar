@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './e2e',
+  // Les parcours qui dialoguent avec l'API réelle (setup, login, admin) ont besoin
+  // du proxy /api de Vite et sont exécutés via playwright.setup.config.js.
+  testIgnore: /(setup|login|admin)\.spec\.js/,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
