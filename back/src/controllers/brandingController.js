@@ -11,6 +11,7 @@ function serializeBranding(branding) {
     faviconUrl: branding.favicon_url,
     iconUrl: branding.icon_url,
     ogImageUrl: branding.og_image_url,
+    backgroundVideoUrl: branding.background_video_url,
     colors: {
       primary: branding.primary_color,
       secondary: branding.secondary_color,
@@ -34,6 +35,7 @@ const FIELD_MAP = {
   faviconUrl: 'favicon_url',
   iconUrl: 'icon_url',
   ogImageUrl: 'og_image_url',
+  backgroundVideoUrl: 'background_video_url',
 };
 
 const COLOR_FIELD_MAP = {

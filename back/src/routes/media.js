@@ -16,7 +16,13 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/svg+xml',
   'image/gif',
   'image/x-icon',
+  'video/mp4',
+  'video/webm',
 ]);
+
+const VIDEO_MIME_TYPES = new Set(['video/mp4', 'video/webm']);
+const IMAGE_MAX_SIZE = 5 * 1024 * 1024;
+const VIDEO_MAX_SIZE = 50 * 1024 * 1024;
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -30,7 +36,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: VIDEO_MAX_SIZE },
   fileFilter(req, file, cb) {
     if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
       return cb(new Error('Type de fichier non autorisé'));
@@ -39,9 +45,19 @@ const upload = multer({
   },
 });
 
+function enforceSizeByType(req, res, next) {
+  if (!req.file) return next();
+  const maxSize = VIDEO_MIME_TYPES.has(req.file.mimetype) ? VIDEO_MAX_SIZE : IMAGE_MAX_SIZE;
+  if (req.file.size > maxSize) {
+    fs.unlink(req.file.path, () => {});
+    return res.status(400).json({ error: 'Fichier trop volumineux' });
+  }
+  next();
+}
+
 const router = Router();
 
-router.post('/upload', requireAdmin, upload.single('file'), uploadMedia, (error, req, res, _next) => {
+router.post('/upload', requireAdmin, upload.single('file'), enforceSizeByType, uploadMedia, (error, req, res, _next) => {
   return res.status(400).json({ error: error.message || 'Échec de l’import du fichier' });
 });
 

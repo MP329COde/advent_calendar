@@ -89,6 +89,7 @@ db.exec(`
     favicon_url TEXT,
     icon_url TEXT,
     og_image_url TEXT,
+    background_video_url TEXT,
     primary_color TEXT NOT NULL DEFAULT '#B91C1C',
     secondary_color TEXT NOT NULL DEFAULT '#166534',
     accent_color TEXT NOT NULL DEFAULT '#D4AF37',
@@ -565,6 +566,10 @@ db.exec(`
 
   COMMIT;
 `);
+
+if (tableExists('branding')) {
+  addColumn('branding', 'background_video_url', 'TEXT');
+}
 
 if (tableExists('users')) {
   addColumn('users', 'email', 'TEXT');
