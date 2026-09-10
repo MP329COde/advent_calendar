@@ -4,7 +4,9 @@ import Header from './components/Header/Header'
 import Footer from './components/Footer/Footer'
 import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 import Home from './pages/Home/Home'
+import About from './pages/About/About'
 import NotFound from './pages/NotFound/NotFound'
+import Admin from './pages/Admin/admin'
 
 function App() {
   return (
@@ -15,8 +17,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="*" element={<NotFound />} />
-          <Route path="/About" element={<h1>À propos</h1>} />
-          <Route path="/Admin" element={<h1>Admin</h1>} />
+          <Route path="/About" element={<About />} />
+          <Route path="/Admin" element={<Admin />} />
         </Routes>
       </main>
       <Footer />

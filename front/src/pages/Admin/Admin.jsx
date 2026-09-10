@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
 import './Admin.css'
+import Login from '../../components/Login/Login'
+
 
 function Admin() {
     useEffect(() => {
@@ -11,10 +13,10 @@ function Admin() {
         return res.json()
       })
       .then((data) => {
-        if (!cancelled) login(data)
+        if (!cancelled) (data)
       })
       .catch((err) => {
-        if (!cancelled) login(err.message)
+        if (!cancelled) (err.message)
       })
 
     fetch('/api/admin')
@@ -23,11 +25,24 @@ function Admin() {
         return res.json()
       })
       .then((data) => {
-        if (!cancelled) setDays(data)
+        if (!cancelled)(data)
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message)
+        if (!cancelled) (err.message)
       })
+
+    fetch('/api/admin')
+      .then((res) => {
+        if (!res.ok) throw new Error('Erreur lors du chargement du calendrier')
+        return res.json()
+      })
+      .then((data) => {
+        if (!cancelled)(data)
+      })
+      .catch((err) => {
+        if (!cancelled) (err.message)
+      })
+
 
     return () => {
       cancelled = true
@@ -36,6 +51,7 @@ function Admin() {
     return (
         <div className="admin">
             <h1>Admin</h1>
+            <Login />
         </div>
     )
 }
