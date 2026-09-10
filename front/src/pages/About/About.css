@@ -1,15 +1,19 @@
-.not-found {
+.about {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-md);
+  gap: var(--space-lg);
+  max-width: 640px;
+  margin: 0 auto;
   flex-grow: 1;
   padding: var(--space-2xl) var(--margin-screen);
   text-align: center;
 }
 
-.not-found__link {
+.about h1 {
+  margin: 0;
+}
+
+.about__link {
   color: var(--color-primary);
   font-weight: 600;
   text-decoration: none;
