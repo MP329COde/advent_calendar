@@ -16,6 +16,44 @@ const COLOR_LABELS = {
   muted: 'Texte discret',
 }
 
+const FONT_PAIRINGS = [
+  {
+    id: 'nocturne',
+    label: 'Nocturne (élégant)',
+    fontFamily: 'Plus Jakarta Sans',
+    headingFontFamily: 'Playfair Display',
+  },
+  {
+    id: 'chaleureux',
+    label: 'Chaleureux',
+    fontFamily: 'Inter',
+    headingFontFamily: 'Fraunces',
+  },
+  {
+    id: 'code',
+    label: 'Atelier de code',
+    fontFamily: 'Inter',
+    headingFontFamily: 'Space Grotesk',
+  },
+  {
+    id: 'festif',
+    label: 'Festif rond',
+    fontFamily: 'Poppins',
+    headingFontFamily: 'Poppins',
+  },
+]
+
+const RADIUS_PRESETS = [
+  { id: 'sharp', label: 'Anguleux', value: 4 },
+  { id: 'soft', label: 'Adouci', value: 16 },
+  { id: 'round', label: 'Arrondi', value: 28 },
+]
+
+const CARD_STYLES = [
+  { id: 'classic', label: 'Classique' },
+  { id: 'ticket', label: 'Porte d’avent' },
+]
+
 function ThemeManager() {
   const { theme: activeTheme, refresh } = useTheme()
   const [themes, setThemes] = useState([])
@@ -100,6 +138,56 @@ function ThemeManager() {
     if (res.ok && theme.id === activeTheme?.id) {
       refresh()
     }
+  }
+
+  async function saveConfig(theme, nextConfig) {
+    setThemes((prev) => prev.map((t) => (t.id === theme.id ? { ...t, config: nextConfig } : t)))
+
+    const res = await fetch(`/api/themes/${theme.id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: nextConfig }),
+    })
+
+    if (res.ok && theme.id === activeTheme?.id) {
+      refresh()
+    }
+  }
+
+  function updateTypography(theme, pairing) {
+    return saveConfig(theme, {
+      ...theme.config,
+      typography: { fontFamily: pairing.fontFamily, headingFontFamily: pairing.headingFontFamily },
+    })
+  }
+
+  function updateRadius(theme, radius) {
+    return saveConfig(theme, {
+      ...theme.config,
+      shape: { ...theme.config.shape, radius },
+    })
+  }
+
+  function updateCardStyle(theme, cardStyle) {
+    return saveConfig(theme, {
+      ...theme.config,
+      calendar: { ...theme.config.calendar, cardStyle },
+    })
+  }
+
+  function toggleEffect(theme, key, value) {
+    return saveConfig(theme, {
+      ...theme.config,
+      effects: { ...theme.config.effects, [key]: value },
+    })
+  }
+
+  function toggleAnimation(theme, key, value) {
+    return saveConfig(theme, {
+      ...theme.config,
+      animation: { ...theme.config.animation, [key]: value },
+    })
   }
 
   async function deleteTheme(id) {
@@ -273,6 +361,129 @@ function ThemeManager() {
                     </div>
                   )
                 })}
+              </div>
+
+              <div className="admin-theme-card__style">
+                <div className="admin-style-field">
+                  <span>Typographie</span>
+                  <div className="admin-font-options">
+                    {FONT_PAIRINGS.map((pairing) => {
+                      const isSelected =
+                        theme.config.typography?.headingFontFamily === pairing.headingFontFamily &&
+                        theme.config.typography?.fontFamily === pairing.fontFamily
+
+                      return (
+                        <button
+                          key={pairing.id}
+                          type="button"
+                          className={isSelected ? 'admin-font-option is-selected' : 'admin-font-option'}
+                          style={{ fontFamily: `${pairing.headingFontFamily}, serif` }}
+                          onClick={() => updateTypography(theme, pairing)}
+                        >
+                          {pairing.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="admin-style-field">
+                  <span>Forme des coins</span>
+                  <div className="admin-radius-options">
+                    {RADIUS_PRESETS.map((preset) => {
+                      const isSelected = theme.config.shape?.radius === preset.value
+
+                      return (
+                        <button
+                          key={preset.id}
+                          type="button"
+                          className={isSelected ? 'admin-radius-option is-selected' : 'admin-radius-option'}
+                          onClick={() => updateRadius(theme, preset.value)}
+                        >
+                          <span
+                            className="admin-radius-preview"
+                            style={{ borderRadius: `${preset.value}px` }}
+                          />
+                          {preset.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="admin-style-field">
+                  <span>Style des cases du calendrier</span>
+                  <div className="admin-font-options">
+                    {CARD_STYLES.map((style) => {
+                      const isSelected = (theme.config.calendar?.cardStyle ?? 'classic') === style.id
+
+                      return (
+                        <button
+                          key={style.id}
+                          type="button"
+                          className={isSelected ? 'admin-font-option is-selected' : 'admin-font-option'}
+                          onClick={() => updateCardStyle(theme, style.id)}
+                        >
+                          {style.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+
+                <div className="admin-style-field">
+                  <span>Effets et animations</span>
+                  <div className="admin-effect-toggles">
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={theme.config.effects?.shadows !== false}
+                        onChange={(event) => toggleEffect(theme, 'shadows', event.target.checked)}
+                      />
+                      Ombres portées
+                    </label>
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(theme.config.effects?.glow)}
+                        onChange={(event) => toggleEffect(theme, 'glow', event.target.checked)}
+                      />
+                      Lueur sur les cases débloquées
+                    </label>
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(theme.config.animation?.snow)}
+                        onChange={(event) => toggleAnimation(theme, 'snow', event.target.checked)}
+                      />
+                      Neige animée
+                    </label>
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(theme.config.animation?.stars)}
+                        onChange={(event) => toggleAnimation(theme, 'stars', event.target.checked)}
+                      />
+                      Étoiles scintillantes
+                    </label>
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(theme.config.animation?.lights)}
+                        onChange={(event) => toggleAnimation(theme, 'lights', event.target.checked)}
+                      />
+                      Guirlande lumineuse
+                    </label>
+                    <label className="admin-effect-toggle">
+                      <input
+                        type="checkbox"
+                        checked={Boolean(theme.config.animation?.confetti)}
+                        onChange={(event) => toggleAnimation(theme, 'confetti', event.target.checked)}
+                      />
+                      Confettis festifs
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="admin-theme-card__actions">

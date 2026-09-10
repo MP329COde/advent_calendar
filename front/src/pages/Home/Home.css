@@ -47,13 +47,40 @@
   background: var(--color-surface-container);
   border: 1px solid var(--border);
   color: var(--color-on-surface-variant);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+:root[data-card-style='ticket'] .day-card::before {
+  content: '';
+  position: absolute;
+  inset: var(--space-xxs);
+  border: 1px dashed var(--border);
+  border-radius: calc(var(--radius-md) - 2px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.day-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--color-primary);
 }
 
 .day-card--unlocked {
   background: var(--color-primary-container);
   border-color: var(--color-primary);
   color: var(--color-on-primary-container);
-  box-shadow: var(--shadow-1);
+  box-shadow: var(--shadow-1), var(--shadow-glow);
+}
+
+:root[data-card-style='ticket'] .day-card--unlocked::before {
+  border-style: solid;
+  border-color: var(--color-primary);
+  opacity: 0.3;
+}
+
+.day-card--unlocked:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: var(--shadow-2), var(--shadow-glow);
 }
 
 .day-card__lock {
@@ -62,4 +89,15 @@
   right: var(--space-xxs);
   font-size: 12px;
   opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .day-card,
+  .day-card--unlocked {
+    transition: none;
+  }
+  .day-card:hover,
+  .day-card--unlocked:hover {
+    transform: none;
+  }
 }

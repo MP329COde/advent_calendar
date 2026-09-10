@@ -83,6 +83,7 @@
   /* Ombres (niveau 1 / niveau 2 — cf. Elevation & Depth) */
   --shadow-1: 0 8px 24px rgba(36, 48, 71, 0.1);
   --shadow-2: 0 12px 30px rgba(217, 119, 6, 0.18);
+  --shadow-glow: none;
 
   /* Alias legacy conservés pour la page de démarrage Vite */
   --text: var(--color-on-surface-variant);

@@ -22,4 +22,6 @@ export const DEFAULT_THEME_CONFIG = {
     headingFontFamily: 'system-ui',
   },
   shape: { radius: 16 },
+  effects: { shadows: true, glow: false },
+  calendar: { cardStyle: 'classic' },
 }
