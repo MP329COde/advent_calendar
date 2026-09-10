@@ -1,4 +1,6 @@
 .snow-overlay {
+  contain: strict;
+  will-change: transform;
   position: fixed;
   inset: 0;
   pointer-events: none;

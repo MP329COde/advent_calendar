@@ -6,8 +6,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--space-lg);
-  background: rgba(10, 10, 20, 0.6);
-  backdrop-filter: blur(3px);
+  background: rgba(10, 10, 20, 0.72);
   animation: day-modal-fade 0.2s ease;
 }
 

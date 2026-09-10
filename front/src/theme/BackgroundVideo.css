@@ -6,4 +6,12 @@
   object-fit: cover;
   z-index: -1;
   pointer-events: none;
+  contain: strict;
+  transform: translateZ(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-background-video {
+    display: none;
+  }
 }

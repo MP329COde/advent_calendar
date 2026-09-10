@@ -1,4 +1,6 @@
 .lights-garland {
+  contain: strict;
+  will-change: transform;
   position: fixed;
   top: 0;
   left: 0;

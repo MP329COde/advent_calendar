@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import useDocumentTitle from '../../hooks/useDocumentTitle'
+import PageMusicPlayer from '../../theme/PageMusicPlayer'
 import './About.css'
 
 function About() {
@@ -7,6 +8,7 @@ function About() {
 
   return (
     <div className="about">
+      <PageMusicPlayer pageKey="about" />
       <h1 className="text-headline-lg">À propos du calendrier</h1>
       <p className="text-body-lg">
         Chaque jour du 1er au 24 décembre, une nouvelle case se débloque et

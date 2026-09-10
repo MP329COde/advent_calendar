@@ -4,8 +4,20 @@ import { loadDesigns } from '../../../designs/loadDesigns'
 import { PALETTE_SUGGESTIONS } from '../../../designs/paletteSuggestions'
 import ColorWheel from '../../../components/ColorWheel/ColorWheel'
 import SnowOverlay from '../../../theme/SnowOverlay'
+import { shuffleArray } from '../../../utils/shuffle'
 
 const AVAILABLE_DESIGNS = loadDesigns()
+
+const PAGE_MUSIC_TARGETS = [
+  { key: 'home', label: 'Page d’accueil' },
+  { key: 'about', label: 'Page À propos' },
+]
+
+const SHUFFLE_MODES = [
+  { id: 'off', label: 'Ordre normal' },
+  { id: 'auto', label: 'Mélange automatique' },
+  { id: 'manual', label: 'Ordre manuel' },
+]
 
 const COLOR_LABELS = {
   primary: 'Primaire',
@@ -64,6 +76,7 @@ function ThemeManager() {
   const [importingDesign, setImportingDesign] = useState(null)
   const [wheelFor, setWheelFor] = useState(null)
   const [uploadingMosaicFor, setUploadingMosaicFor] = useState(null)
+  const [uploadingMusicFor, setUploadingMusicFor] = useState(null)
 
   async function loadThemes() {
     try {
@@ -201,6 +214,72 @@ function ThemeManager() {
     } finally {
       setUploadingMosaicFor(null)
     }
+  }
+
+  async function updatePageMusicFile(theme, pageKey, file) {
+    if (!file) return
+    setUploadingMusicFor(`${theme.id}:${pageKey}`)
+    setError(null)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/media/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      })
+      if (!res.ok) throw new Error((await res.json()).error ?? "Échec de l'import")
+      const { url } = await res.json()
+      await saveConfig(theme, {
+        ...theme.config,
+        pages: {
+          ...theme.config.pages,
+          [pageKey]: { ...theme.config.pages?.[pageKey], musicUrl: url },
+        },
+      })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setUploadingMusicFor(null)
+    }
+  }
+
+  function updatePageMusicYoutube(theme, pageKey, value) {
+    return saveConfig(theme, {
+      ...theme.config,
+      pages: {
+        ...theme.config.pages,
+        [pageKey]: { ...theme.config.pages?.[pageKey], musicYoutubeUrl: value },
+      },
+    })
+  }
+
+  function updateShuffleMode(theme, shuffle) {
+    return saveConfig(theme, {
+      ...theme.config,
+      calendar: { ...theme.config.calendar, shuffle },
+    })
+  }
+
+  function shuffleDayOrder(theme) {
+    const order = shuffleArray(Array.from({ length: 24 }, (_, i) => i + 1))
+    return saveConfig(theme, {
+      ...theme.config,
+      calendar: { ...theme.config.calendar, dayOrder: order },
+    })
+  }
+
+  function moveDayInOrder(theme, index, direction) {
+    const order = theme.config.calendar?.dayOrder?.length
+      ? [...theme.config.calendar.dayOrder]
+      : Array.from({ length: 24 }, (_, i) => i + 1)
+    const target = index + direction
+    if (target < 0 || target >= order.length) return
+    ;[order[index], order[target]] = [order[target], order[index]]
+    return saveConfig(theme, {
+      ...theme.config,
+      calendar: { ...theme.config.calendar, dayOrder: order },
+    })
   }
 
   function toggleEffect(theme, key, value) {
@@ -459,6 +538,60 @@ function ThemeManager() {
                 </div>
 
                 <div className="admin-style-field">
+                  <span>Disposition des cases</span>
+                  <div className="admin-font-options">
+                    {SHUFFLE_MODES.map((mode) => {
+                      const isSelected = (theme.config.calendar?.shuffle ?? 'off') === mode.id
+
+                      return (
+                        <button
+                          key={mode.id}
+                          type="button"
+                          className={isSelected ? 'admin-font-option is-selected' : 'admin-font-option'}
+                          onClick={() => updateShuffleMode(theme, mode.id)}
+                        >
+                          {mode.label}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {theme.config.calendar?.shuffle === 'manual' && (
+                    <div className="admin-day-order">
+                      <button type="button" onClick={() => shuffleDayOrder(theme)}>
+                        🔀 Mélanger aléatoirement
+                      </button>
+                      <ol className="admin-day-order__list">
+                        {(theme.config.calendar?.dayOrder?.length
+                          ? theme.config.calendar.dayOrder
+                          : Array.from({ length: 24 }, (_, i) => i + 1)
+                        ).map((day, index, arr) => (
+                          <li key={day}>
+                            <span>Jour {day}</span>
+                            <button
+                              type="button"
+                              disabled={index === 0}
+                              onClick={() => moveDayInOrder(theme, index, -1)}
+                              aria-label={`Monter le jour ${day}`}
+                            >
+                              ↑
+                            </button>
+                            <button
+                              type="button"
+                              disabled={index === arr.length - 1}
+                              onClick={() => moveDayInOrder(theme, index, 1)}
+                              aria-label={`Descendre le jour ${day}`}
+                            >
+                              ↓
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-style-field">
                   <span>Image mosaïque du calendrier</span>
                   <p className="admin-section__hint">
                     Une seule image est découpée automatiquement : chaque case du calendrier
@@ -494,6 +627,61 @@ function ThemeManager() {
                       </button>
                     </div>
                   )}
+                </div>
+
+                <div className="admin-style-field">
+                  <span>Musique des pages</span>
+                  <p className="admin-section__hint">
+                    Une piste audio par page (fichier ou lien YouTube). La lecture démarre au
+                    clic du visiteur sur le bouton 🎵, jamais automatiquement.
+                  </p>
+                  {PAGE_MUSIC_TARGETS.map((target) => {
+                    const pageConfig = theme.config.pages?.[target.key] ?? {}
+                    const uploadKey = `${theme.id}:${target.key}`
+
+                    return (
+                      <div key={target.key} className="admin-page-music">
+                        <span className="admin-page-music__label">{target.label}</span>
+                        <input
+                          type="file"
+                          accept="audio/*"
+                          disabled={uploadingMusicFor === uploadKey}
+                          onChange={(event) => {
+                            const file = event.target.files?.[0]
+                            updatePageMusicFile(theme, target.key, file)
+                            event.target.value = ''
+                          }}
+                        />
+                        {pageConfig.musicUrl && (
+                          <div className="admin-day-preview">
+                            <audio src={pageConfig.musicUrl} controls />
+                            <button
+                              type="button"
+                              onClick={() =>
+                                saveConfig(theme, {
+                                  ...theme.config,
+                                  pages: {
+                                    ...theme.config.pages,
+                                    [target.key]: { ...pageConfig, musicUrl: null },
+                                  },
+                                })
+                              }
+                            >
+                              Retirer
+                            </button>
+                          </div>
+                        )}
+                        <input
+                          type="text"
+                          placeholder="ou un lien YouTube (https://youtube.com/watch?v=...)"
+                          defaultValue={pageConfig.musicYoutubeUrl ?? ''}
+                          onBlur={(event) =>
+                            updatePageMusicYoutube(theme, target.key, event.target.value)
+                          }
+                        />
+                      </div>
+                    )
+                  })}
                 </div>
 
                 <div className="admin-style-field">

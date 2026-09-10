@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useDocumentTitle from '../../hooks/useDocumentTitle'
 import { useTheme } from '../../theme/useTheme'
+import PageMusicPlayer from '../../theme/PageMusicPlayer'
+import { shuffleArray } from '../../utils/shuffle'
 import DayModal from './DayModal'
 import './Home.css'
 
@@ -69,7 +71,25 @@ function Home() {
   }, [])
 
   const mosaicImage = theme?.config?.calendar?.backgroundImage ?? null
-  const rows = Math.ceil(days.length / cols) || 1
+  const shuffleMode = theme?.config?.calendar?.shuffle ?? 'off'
+  const manualOrder = theme?.config?.calendar?.dayOrder
+
+  const orderedDays = useMemo(() => {
+    if (shuffleMode === 'manual' && Array.isArray(manualOrder) && manualOrder.length) {
+      const byDay = new Map(days.map((d) => [d.day, d]))
+      const ordered = manualOrder.map((day) => byDay.get(day)).filter(Boolean)
+      const missing = days.filter((d) => !manualOrder.includes(d.day))
+      return [...ordered, ...missing]
+    }
+
+    if (shuffleMode === 'auto') {
+      return shuffleArray(days)
+    }
+
+    return days
+  }, [days, shuffleMode, manualOrder])
+
+  const rows = Math.ceil(orderedDays.length / cols) || 1
 
   function openDay(day, unlocked) {
     if (!unlocked) return
@@ -78,6 +98,7 @@ function Home() {
 
   return (
     <div className="home">
+      <PageMusicPlayer pageKey="home" />
       <section className="home__hero">
         <h1 className="text-display-hero">Calendrier de l&apos;Avent</h1>
         <p className="text-body-lg">
@@ -93,7 +114,7 @@ function Home() {
       )}
 
       <section className="home__grid" aria-label="Cases du calendrier">
-        {days.map(({ day, unlocked, title }, index) => (
+        {orderedDays.map(({ day, unlocked, title }, index) => (
           <button
             key={day}
             type="button"

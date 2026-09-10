@@ -1,0 +1,31 @@
+.page-music-player {
+  position: fixed;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  z-index: 50;
+}
+
+.page-music-player__toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--color-surface-container-high);
+  color: var(--color-on-surface);
+  font-size: 18px;
+  cursor: pointer;
+  box-shadow: var(--shadow-1);
+}
+
+.page-music-player__toggle:hover {
+  background: var(--color-primary-container);
+}
+
+.page-music-player__youtube {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+  border: 0;
+}

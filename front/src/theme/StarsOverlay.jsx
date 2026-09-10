@@ -14,8 +14,8 @@ function makeStars(count) {
   }))
 }
 
-function StarsOverlay() {
-  const stars = useMemo(() => makeStars(24), [])
+function StarsOverlay({ count = 24 }) {
+  const stars = useMemo(() => makeStars(count), [count])
 
   return (
     <div className="stars-overlay" aria-hidden="true">
