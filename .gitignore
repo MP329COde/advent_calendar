@@ -8,3 +8,9 @@ back/.env
 front/.playwright-cli
 back/package-lock.json
 front/package-lock.json
+.playwright-cli
+back/test-results
+front/test-results
+scratch_video
+.DS_Store
+**/.DS_Store
