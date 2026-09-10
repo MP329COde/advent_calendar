@@ -1,0 +1,33 @@
+.snow-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 40;
+}
+
+.snow-overlay__flake {
+  position: absolute;
+  top: -10%;
+  color: color-mix(in srgb, var(--color-on-surface-variant, #6f5a55) 55%, var(--color-tertiary, #9bb8e8) 45%);
+  text-shadow: 0 0 6px color-mix(in srgb, var(--color-tertiary, #9bb8e8) 55%, transparent);
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes snow-fall {
+  from {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(var(--drift), 110vh, 0) rotate(var(--spin));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snow-overlay {
+    display: none;
+  }
+}

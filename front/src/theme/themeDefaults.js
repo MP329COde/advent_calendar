@@ -23,5 +23,6 @@ export const DEFAULT_THEME_CONFIG = {
   },
   shape: { radius: 16 },
   effects: { shadows: true, glow: false },
+  animation: { snow: false, stars: false, confetti: false, lights: false },
   calendar: { cardStyle: 'classic' },
 }

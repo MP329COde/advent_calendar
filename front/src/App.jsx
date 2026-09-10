@@ -11,6 +11,7 @@ import Admin from './pages/Admin/Admin'
 import Setup from './pages/Setup/Setup'
 import ThemeProvider from './theme/ThemeProvider'
 import BackgroundVideo from './theme/BackgroundVideo'
+import EffectsLayer from './theme/EffectsLayer'
 import AuthProvider from './auth/AuthProvider'
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
     <ThemeProvider>
       <AuthProvider>
         <BackgroundVideo />
+        <EffectsLayer />
         <ScrollToTop />
         <Header />
         <main className="app-main">

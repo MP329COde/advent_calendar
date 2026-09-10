@@ -1,0 +1,35 @@
+.stars-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 39;
+}
+
+.stars-overlay__star {
+  position: absolute;
+  color: var(--color-secondary, #d4af37);
+  text-shadow: 0 0 8px currentColor;
+  animation-name: star-twinkle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes star-twinkle {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stars-overlay__star {
+    animation: none;
+    opacity: 0.5;
+  }
+}
