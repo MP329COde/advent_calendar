@@ -21,28 +21,51 @@ function BrandingManager() {
     setForm((prev) => ({ ...prev, [name]: value }))
   }
 
+  async function uploadFile(file) {
+    const body = new FormData()
+    body.append('file', file)
+
+    const res = await fetch('/api/media/upload', {
+      method: 'POST',
+      credentials: 'include',
+      body,
+    })
+    if (!res.ok) throw new Error((await res.json()).error)
+    return res.json()
+  }
+
   async function handleLogoUpload(event) {
     const file = event.target.files?.[0]
     if (!file) return
 
     setUploading(true)
-    const body = new FormData()
-    body.append('file', file)
-
     try {
-      const res = await fetch('/api/media/upload', {
-        method: 'POST',
-        credentials: 'include',
-        body,
-      })
-      if (!res.ok) throw new Error((await res.json()).error)
-      const { url } = await res.json()
+      const { url } = await uploadFile(file)
       setForm((prev) => ({ ...prev, logoUrl: url }))
     } catch (err) {
       setMessage(err.message)
     } finally {
       setUploading(false)
     }
+  }
+
+  async function handleBackgroundVideoUpload(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setUploading(true)
+    try {
+      const { url } = await uploadFile(file)
+      setForm((prev) => ({ ...prev, backgroundVideoUrl: url }))
+    } catch (err) {
+      setMessage(err.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  function clearBackgroundVideo() {
+    setForm((prev) => ({ ...prev, backgroundVideoUrl: '' }))
   }
 
   async function handleSubmit(event) {
@@ -94,6 +117,25 @@ function BrandingManager() {
 
         {form.logoUrl && (
           <img src={form.logoUrl} alt="Logo actuel" className="admin-logo-preview" />
+        )}
+
+        <label>
+          Vidéo de fond (MP4/WebM, 50 Mo max)
+          <input
+            type="file"
+            accept="video/mp4,video/webm"
+            onChange={handleBackgroundVideoUpload}
+            disabled={uploading}
+          />
+        </label>
+
+        {form.backgroundVideoUrl && (
+          <div className="admin-video-preview">
+            <video src={form.backgroundVideoUrl} muted autoPlay loop playsInline />
+            <button type="button" className="admin-btn-danger" onClick={clearBackgroundVideo}>
+              Retirer la vidéo de fond
+            </button>
+          </div>
         )}
 
         <button type="submit" disabled={saving || uploading}>

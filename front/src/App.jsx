@@ -10,6 +10,7 @@ import NotFound from './pages/NotFound/NotFound'
 import Admin from './pages/Admin/Admin'
 import Setup from './pages/Setup/Setup'
 import ThemeProvider from './theme/ThemeProvider'
+import BackgroundVideo from './theme/BackgroundVideo'
 import AuthProvider from './auth/AuthProvider'
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
+        <BackgroundVideo />
         <ScrollToTop />
         <Header />
         <main className="app-main">
