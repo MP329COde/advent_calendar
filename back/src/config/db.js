@@ -789,6 +789,90 @@ if (themeExists) {
   defaultThemeId = Number(themeResult.lastInsertRowid);
 }
 
+const additionalThemes = [
+  {
+    name: 'Givre polaire',
+    slug: 'polar-frost',
+    description: 'Palette bleutée et glacée, ambiance nuit étoilée',
+    colors: {
+      primary: '#1D4ED8',
+      secondary: '#0EA5E9',
+      accent: '#E0F2FE',
+      background: '#F8FAFC',
+      surface: '#FFFFFF',
+      text: '#0F172A',
+      muted: '#64748B'
+    },
+    animation: { enabled: true, snow: true, stars: true, confetti: false }
+  },
+  {
+    name: 'Or festif',
+    slug: 'festive-gold',
+    description: 'Tons chauds ambrés et dorés, élégance feutrée',
+    colors: {
+      primary: '#92400E',
+      secondary: '#B45309',
+      accent: '#FDE68A',
+      background: '#FFFBEB',
+      surface: '#FFFFFF',
+      text: '#1C1917',
+      muted: '#78716C'
+    },
+    animation: { enabled: true, snow: false, stars: true, confetti: true }
+  },
+  {
+    name: 'Minuit violet',
+    slug: 'midnight-violet',
+    description: 'Ambiance sombre et magique, idéale en soirée',
+    colors: {
+      primary: '#7C3AED',
+      secondary: '#4C1D95',
+      accent: '#C4B5FD',
+      background: '#0F172A',
+      surface: '#1E293B',
+      text: '#F1F5F9',
+      muted: '#94A3B8'
+    },
+    animation: { enabled: true, snow: true, stars: true, confetti: true }
+  }
+];
+
+const insertTheme = db.prepare(`
+  INSERT INTO themes (name, slug, description, config, is_default, is_active)
+  VALUES (?, ?, ?, ?, 0, 1)
+`);
+
+const seedAdditionalThemes = db.transaction(() => {
+  for (const theme of additionalThemes) {
+    const exists = db
+      .prepare('SELECT id FROM themes WHERE slug = ?')
+      .get(theme.slug);
+
+    if (exists) continue;
+
+    insertTheme.run(
+      theme.name,
+      theme.slug,
+      theme.description,
+      JSON.stringify({
+        colors: theme.colors,
+        typography: {
+          fontFamily: 'system-ui',
+          headingFontFamily: 'system-ui',
+          headingWeight: 700,
+          bodyWeight: 400
+        },
+        shape: { radius: 16 },
+        effects: { shadows: true, glass: false, glow: true },
+        animation: theme.animation,
+        calendar: { cardStyle: 'classic', gridStyle: 'grid' }
+      })
+    );
+  }
+});
+
+seedAdditionalThemes();
+
 const featureFlags = [
   ['calendar.quiz', 1, '{}', 'Activer les quiz'],
   ['calendar.riddle', 1, '{}', 'Activer les énigmes'],
