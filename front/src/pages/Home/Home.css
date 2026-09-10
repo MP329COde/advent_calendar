@@ -39,15 +39,24 @@
 
 .day-card {
   position: relative;
+  z-index: 1;
   aspect-ratio: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
-  background: var(--color-surface-container);
+  background-color: var(--color-surface-container);
+  background-repeat: no-repeat;
   border: 1px solid var(--border);
   color: var(--color-on-surface-variant);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
   transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.day-card:disabled {
+  cursor: not-allowed;
 }
 
 :root[data-card-style='ticket'] .day-card::before {

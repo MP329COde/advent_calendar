@@ -14,7 +14,9 @@ function EffectsLayer() {
 
   return (
     <>
-      {animation.snow && <SnowOverlay />}
+      {animation.snow && (
+        <SnowOverlay density={animation.snowDensity ?? 36} size={animation.snowSize ?? 1} />
+      )}
       {animation.stars && <StarsOverlay />}
       {animation.confetti && <ConfettiOverlay />}
       {animation.lights && <LightsGarland />}

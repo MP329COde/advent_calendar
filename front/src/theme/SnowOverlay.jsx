@@ -3,10 +3,10 @@ import './SnowOverlay.css'
 
 const GLYPHS = ['❄', '❅', '❆']
 
-function makeFlakes(count) {
+function makeFlakes(count, scale) {
   return Array.from({ length: count }, (_, i) => {
     const layer = i % 3 // 0 = far/small, 1 = mid, 2 = near/large
-    const size = layer === 0 ? 10 + Math.random() * 6 : layer === 1 ? 16 + Math.random() * 8 : 24 + Math.random() * 10
+    const size = (layer === 0 ? 10 + Math.random() * 6 : layer === 1 ? 16 + Math.random() * 8 : 24 + Math.random() * 10) * scale
 
     return {
       glyph: GLYPHS[Math.floor(Math.random() * GLYPHS.length)],
@@ -21,8 +21,15 @@ function makeFlakes(count) {
   })
 }
 
-function SnowOverlay() {
-  const flakes = useMemo(() => makeFlakes(36), [])
+const MIN_COUNT = 6
+const MAX_COUNT = 120
+const MIN_SCALE = 0.4
+const MAX_SCALE = 2.5
+
+function SnowOverlay({ density = 36, size = 1 }) {
+  const count = Math.round(Math.min(MAX_COUNT, Math.max(MIN_COUNT, density)))
+  const scale = Math.min(MAX_SCALE, Math.max(MIN_SCALE, size))
+  const flakes = useMemo(() => makeFlakes(count, scale), [count, scale])
 
   return (
     <div className="snow-overlay" aria-hidden="true">

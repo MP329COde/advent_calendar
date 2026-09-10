@@ -1,5 +1,14 @@
 import { db } from '../config/db.js';
 
+function parseSettings(raw) {
+  try {
+    const parsed = JSON.parse(raw || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 /**
  * Vérifie si un jour du calendrier est débloqué.
  *
@@ -41,7 +50,8 @@ export function getDays(req, res) {
           id,
           day_number,
           title,
-          description
+          description,
+          settings
         FROM calendar_days
         WHERE calendar_id = (
           SELECT id
@@ -57,12 +67,15 @@ export function getDays(req, res) {
 
     const days = rows.map((row) => {
       const unlocked = isDayUnlocked(row.day_number, now);
+      const settings = parseSettings(row.settings);
 
       return {
         day: row.day_number,
         unlocked,
         title: unlocked ? row.title : null,
         description: unlocked ? row.description : null,
+        imageUrl: unlocked ? settings.imageUrl ?? null : null,
+        audioUrl: unlocked ? settings.audioUrl ?? null : null,
       };
     });
 
@@ -101,7 +114,8 @@ export function getDay(req, res) {
           id,
           day_number,
           title,
-          description
+          description,
+          settings
         FROM calendar_days
         WHERE calendar_id = (
           SELECT id
@@ -128,11 +142,15 @@ export function getDay(req, res) {
       });
     }
 
+    const settings = parseSettings(row.settings);
+
     return res.json({
       day: row.day_number,
       unlocked: true,
       title: row.title,
       description: row.description,
+      imageUrl: settings.imageUrl ?? null,
+      audioUrl: settings.audioUrl ?? null,
     });
   } catch (error) {
     console.error('[daysController] Erreur lors de la récupération du jour :', error);

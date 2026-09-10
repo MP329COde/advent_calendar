@@ -3,6 +3,7 @@ import { useTheme } from '../../../theme/useTheme'
 import { loadDesigns } from '../../../designs/loadDesigns'
 import { PALETTE_SUGGESTIONS } from '../../../designs/paletteSuggestions'
 import ColorWheel from '../../../components/ColorWheel/ColorWheel'
+import SnowOverlay from '../../../theme/SnowOverlay'
 
 const AVAILABLE_DESIGNS = loadDesigns()
 
@@ -62,6 +63,7 @@ function ThemeManager() {
   const [busySlug, setBusySlug] = useState(null)
   const [importingDesign, setImportingDesign] = useState(null)
   const [wheelFor, setWheelFor] = useState(null)
+  const [uploadingMosaicFor, setUploadingMosaicFor] = useState(null)
 
   async function loadThemes() {
     try {
@@ -174,6 +176,31 @@ function ThemeManager() {
       ...theme.config,
       calendar: { ...theme.config.calendar, cardStyle },
     })
+  }
+
+  async function updateMosaicImage(theme, file) {
+    if (!file) return
+    setUploadingMosaicFor(theme.id)
+    setError(null)
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      const res = await fetch('/api/media/upload', {
+        method: 'POST',
+        credentials: 'include',
+        body: formData,
+      })
+      if (!res.ok) throw new Error((await res.json()).error ?? "Échec de l'import")
+      const { url } = await res.json()
+      await saveConfig(theme, {
+        ...theme.config,
+        calendar: { ...theme.config.calendar, backgroundImage: url },
+      })
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setUploadingMosaicFor(null)
+    }
   }
 
   function toggleEffect(theme, key, value) {
@@ -432,6 +459,44 @@ function ThemeManager() {
                 </div>
 
                 <div className="admin-style-field">
+                  <span>Image mosaïque du calendrier</span>
+                  <p className="admin-section__hint">
+                    Une seule image est découpée automatiquement : chaque case du calendrier
+                    affiche le morceau qui lui correspond.
+                  </p>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={uploadingMosaicFor === theme.id}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      updateMosaicImage(theme, file)
+                      event.target.value = ''
+                    }}
+                  />
+                  {theme.config.calendar?.backgroundImage && (
+                    <div className="admin-day-preview">
+                      <img
+                        src={theme.config.calendar.backgroundImage}
+                        alt=""
+                        className="admin-day-preview__image"
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          saveConfig(theme, {
+                            ...theme.config,
+                            calendar: { ...theme.config.calendar, backgroundImage: null },
+                          })
+                        }
+                      >
+                        Retirer l&apos;image
+                      </button>
+                    </div>
+                  )}
+                </div>
+
+                <div className="admin-style-field">
                   <span>Effets et animations</span>
                   <div className="admin-effect-toggles">
                     <label className="admin-effect-toggle">
@@ -458,6 +523,42 @@ function ThemeManager() {
                       />
                       Neige animée
                     </label>
+                    {theme.config.animation?.snow && (
+                      <div className="admin-snow-tuning">
+                        <label className="admin-range-field">
+                          <span>Quantité de flocons ({theme.config.animation?.snowDensity ?? 36})</span>
+                          <input
+                            type="range"
+                            min={6}
+                            max={120}
+                            step={2}
+                            value={theme.config.animation?.snowDensity ?? 36}
+                            onChange={(event) =>
+                              toggleAnimation(theme, 'snowDensity', Number(event.target.value))
+                            }
+                          />
+                        </label>
+                        <label className="admin-range-field">
+                          <span>Taille des flocons ({(theme.config.animation?.snowSize ?? 1).toFixed(1)}×)</span>
+                          <input
+                            type="range"
+                            min={0.4}
+                            max={2.5}
+                            step={0.1}
+                            value={theme.config.animation?.snowSize ?? 1}
+                            onChange={(event) =>
+                              toggleAnimation(theme, 'snowSize', Number(event.target.value))
+                            }
+                          />
+                        </label>
+                        <div className="admin-snow-preview">
+                          <SnowOverlay
+                            density={theme.config.animation?.snowDensity ?? 36}
+                            size={theme.config.animation?.snowSize ?? 1}
+                          />
+                        </div>
+                      </div>
+                    )}
                     <label className="admin-effect-toggle">
                       <input
                         type="checkbox"

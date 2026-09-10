@@ -1,12 +1,52 @@
 import { useEffect, useState } from 'react'
 import useDocumentTitle from '../../hooks/useDocumentTitle'
+import { useTheme } from '../../theme/useTheme'
+import DayModal from './DayModal'
 import './Home.css'
+
+const DESKTOP_COLS = 6
+const MOBILE_COLS = 4
+const MOBILE_QUERY = '(max-width: 767px)'
+
+function useColumnCount() {
+  const [cols, setCols] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia(MOBILE_QUERY).matches
+      ? MOBILE_COLS
+      : DESKTOP_COLS
+  )
+
+  useEffect(() => {
+    const mql = window.matchMedia(MOBILE_QUERY)
+    const handler = (event) => setCols(event.matches ? MOBILE_COLS : DESKTOP_COLS)
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+
+  return cols
+}
+
+function mosaicStyle(index, cols, rows, imageUrl) {
+  if (!imageUrl) return undefined
+  const col = index % cols
+  const row = Math.floor(index / cols)
+  const x = cols > 1 ? (col / (cols - 1)) * 100 : 50
+  const y = rows > 1 ? (row / (rows - 1)) * 100 : 50
+
+  return {
+    backgroundImage: `url(${imageUrl})`,
+    backgroundSize: `${cols * 100}% ${rows * 100}%`,
+    backgroundPosition: `${x}% ${y}%`,
+  }
+}
 
 function Home() {
   useDocumentTitle()
+  const { theme } = useTheme() ?? {}
 
   const [days, setDays] = useState([])
   const [error, setError] = useState(null)
+  const [selectedDay, setSelectedDay] = useState(null)
+  const cols = useColumnCount()
 
   useEffect(() => {
     let cancelled = false
@@ -28,6 +68,14 @@ function Home() {
     }
   }, [])
 
+  const mosaicImage = theme?.config?.calendar?.backgroundImage ?? null
+  const rows = Math.ceil(days.length / cols) || 1
+
+  function openDay(day, unlocked) {
+    if (!unlocked) return
+    setSelectedDay(day)
+  }
+
   return (
     <div className="home">
       <section className="home__hero">
@@ -45,12 +93,17 @@ function Home() {
       )}
 
       <section className="home__grid" aria-label="Cases du calendrier">
-        {days.map(({ day, unlocked, title }) => (
-          <div
+        {days.map(({ day, unlocked, title }, index) => (
+          <button
             key={day}
-            className={
-              unlocked ? 'day-card day-card--unlocked' : 'day-card'
-            }
+            type="button"
+            className={unlocked ? 'day-card day-card--unlocked' : 'day-card'}
+            style={mosaicStyle(index, cols, rows, mosaicImage)}
+            onClick={() => openDay(day, unlocked)}
+            disabled={!unlocked}
+            data-testid="day-card"
+            data-day={day}
+            data-unlocked={unlocked}
             aria-label={
               unlocked
                 ? `Jour ${day}, débloqué${title ? `, ${title}` : ''}`
@@ -63,9 +116,13 @@ function Home() {
                 🔒
               </span>
             )}
-          </div>
+          </button>
         ))}
       </section>
+
+      {selectedDay && (
+        <DayModal day={selectedDay} onClose={() => setSelectedDay(null)} />
+      )}
     </div>
   )
 }

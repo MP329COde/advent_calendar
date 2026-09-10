@@ -18,11 +18,26 @@ const ALLOWED_MIME_TYPES = new Set([
   'image/x-icon',
   'video/mp4',
   'video/webm',
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/ogg',
+  'audio/x-m4a',
+  'audio/mp4',
 ]);
 
 const VIDEO_MIME_TYPES = new Set(['video/mp4', 'video/webm']);
+const AUDIO_MIME_TYPES = new Set([
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/ogg',
+  'audio/x-m4a',
+  'audio/mp4',
+]);
 const IMAGE_MAX_SIZE = 5 * 1024 * 1024;
 const VIDEO_MAX_SIZE = 50 * 1024 * 1024;
+const AUDIO_MAX_SIZE = 15 * 1024 * 1024;
 
 const storage = multer.diskStorage({
   destination(req, file, cb) {
@@ -47,7 +62,11 @@ const upload = multer({
 
 function enforceSizeByType(req, res, next) {
   if (!req.file) return next();
-  const maxSize = VIDEO_MIME_TYPES.has(req.file.mimetype) ? VIDEO_MAX_SIZE : IMAGE_MAX_SIZE;
+  const maxSize = VIDEO_MIME_TYPES.has(req.file.mimetype)
+    ? VIDEO_MAX_SIZE
+    : AUDIO_MIME_TYPES.has(req.file.mimetype)
+      ? AUDIO_MAX_SIZE
+      : IMAGE_MAX_SIZE;
   if (req.file.size > maxSize) {
     fs.unlink(req.file.path, () => {});
     return res.status(400).json({ error: 'Fichier trop volumineux' });
