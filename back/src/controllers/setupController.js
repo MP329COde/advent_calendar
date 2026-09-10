@@ -169,6 +169,9 @@ export function completeSetup(req, res) {
         colors = {};
       }
 
+      db.prepare('UPDATE themes SET is_default = 0 WHERE is_default = 1').run();
+      db.prepare('UPDATE themes SET is_default = 1 WHERE id = ?').run(selectedTheme.id);
+
       db.prepare(`
         UPDATE branding
         SET platform_name = ?,
