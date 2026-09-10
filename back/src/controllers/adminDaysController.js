@@ -33,7 +33,7 @@ export function listAdminDays(req, res) {
 
   const rows = db
     .prepare(`
-      SELECT id, day_number, title, description, unlock_date, is_enabled
+      SELECT id, day_number, title, description, unlock_date, is_enabled, settings
       FROM calendar_days
       WHERE calendar_id = ?
       ORDER BY day_number ASC
