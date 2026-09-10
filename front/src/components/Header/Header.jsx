@@ -1,8 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import './Header.css'
 
-const Header = 
-
 function Header() {
   return (
     <header className="site-header">
