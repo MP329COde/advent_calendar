@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../../../theme/useTheme'
 import { loadDesigns } from '../../../designs/loadDesigns'
+import { PALETTE_SUGGESTIONS } from '../../../designs/paletteSuggestions'
+import ColorWheel from '../../../components/ColorWheel/ColorWheel'
 
 const AVAILABLE_DESIGNS = loadDesigns()
 
@@ -21,6 +23,7 @@ function ThemeManager() {
   const [error, setError] = useState(null)
   const [busySlug, setBusySlug] = useState(null)
   const [importingDesign, setImportingDesign] = useState(null)
+  const [wheelFor, setWheelFor] = useState(null)
 
   async function loadThemes() {
     try {
@@ -63,6 +66,26 @@ function ThemeManager() {
     const nextConfig = {
       ...theme.config,
       colors: { ...theme.config.colors, [key]: value },
+    }
+
+    setThemes((prev) => prev.map((t) => (t.id === theme.id ? { ...t, config: nextConfig } : t)))
+
+    const res = await fetch(`/api/themes/${theme.id}`, {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ config: nextConfig }),
+    })
+
+    if (res.ok && theme.id === activeTheme?.id) {
+      refresh()
+    }
+  }
+
+  async function applyPalette(theme, palette) {
+    const nextConfig = {
+      ...theme.config,
+      colors: { ...theme.config.colors, ...palette.colors },
     }
 
     setThemes((prev) => prev.map((t) => (t.id === theme.id ? { ...t, config: nextConfig } : t)))
@@ -204,17 +227,52 @@ function ThemeManager() {
               </div>
               <p className="admin-theme-card__description">{theme.description}</p>
 
-              <div className="admin-theme-card__colors">
-                {Object.entries(theme.config.colors ?? {}).map(([key, value]) => (
-                  <label key={key} className="admin-color-field">
-                    <span>{COLOR_LABELS[key] ?? key}</span>
-                    <input
-                      type="color"
-                      value={value}
-                      onChange={(event) => updateColor(theme, key, event.target.value)}
-                    />
-                  </label>
+              <div className="admin-palette-suggestions">
+                {PALETTE_SUGGESTIONS.map((palette) => (
+                  <button
+                    key={palette.name}
+                    type="button"
+                    className="admin-palette-swatch"
+                    title={palette.name}
+                    onClick={() => applyPalette(theme, palette)}
+                    style={{
+                      background: `linear-gradient(135deg, ${palette.colors.primary}, ${palette.colors.secondary}, ${palette.colors.accent})`,
+                    }}
+                  />
                 ))}
+              </div>
+
+              <div className="admin-theme-card__colors">
+                {Object.entries(theme.config.colors ?? {}).map(([key, value]) => {
+                  const wheelKey = `${theme.id}:${key}`
+                  const isWheelOpen = wheelFor === wheelKey
+
+                  return (
+                    <div key={key} className="admin-color-field">
+                      <label>
+                        <span>{COLOR_LABELS[key] ?? key}</span>
+                        <input
+                          type="color"
+                          value={value}
+                          onChange={(event) => updateColor(theme, key, event.target.value)}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="admin-color-wheel-toggle"
+                        onClick={() => setWheelFor(isWheelOpen ? null : wheelKey)}
+                      >
+                        {isWheelOpen ? 'Fermer' : '🎨 Roue'}
+                      </button>
+                      {isWheelOpen && (
+                        <ColorWheel
+                          value={value}
+                          onChange={(nextValue) => updateColor(theme, key, nextValue)}
+                        />
+                      )}
+                    </div>
+                  )
+                })}
               </div>
 
               <div className="admin-theme-card__actions">

@@ -246,6 +246,13 @@
   color: var(--color-on-surface-variant);
 }
 
+.admin-color-field label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
 .admin-color-field input[type='color'] {
   width: 2rem;
   height: 2rem;
@@ -254,6 +261,31 @@
   padding: 0;
   background: none;
   cursor: pointer;
+}
+
+.admin-color-wheel-toggle {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-outline-variant);
+  background: var(--color-surface-bright);
+  cursor: pointer;
+}
+
+.admin-palette-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.admin-palette-swatch {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--color-outline-variant);
+  cursor: pointer;
+  padding: 0;
 }
 
 .admin-theme-card__actions {
