@@ -9,6 +9,8 @@ import About from './pages/About/About'
 import NotFound from './pages/NotFound/NotFound'
 import Admin from './pages/Admin/Admin'
 import Setup from './pages/Setup/Setup'
+import ThemeProvider from './theme/ThemeProvider'
+import AuthProvider from './auth/AuthProvider'
 
 function App() {
   const [setupStatus, setSetupStatus] = useState(null)
@@ -50,20 +52,22 @@ function App() {
   }
 
   return (
-    <>
-      <ScrollToTop />
-      <Header />
-      <main className="app-main">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<NotFound />} />
-          <Route path="/About" element={<About />} />
-          <Route path="/Admin" element={<Admin />} />
-          <Route path="/setup" element={<Navigate to="/Admin" replace />} />
-        </Routes>
-      </main>
-      <Footer />
-    </>
+    <ThemeProvider>
+      <AuthProvider>
+        <ScrollToTop />
+        <Header />
+        <main className="app-main">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/About" element={<About />} />
+            <Route path="/Admin" element={<Admin />} />
+            <Route path="/setup" element={<Navigate to="/Admin" replace />} />
+          </Routes>
+        </main>
+        <Footer />
+      </AuthProvider>
+    </ThemeProvider>
   )
 }
 
