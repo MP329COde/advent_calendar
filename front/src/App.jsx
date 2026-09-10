@@ -7,7 +7,7 @@ import ScrollToTop from './components/ScrollToTop/ScrollToTop'
 import Home from './pages/Home/Home'
 import About from './pages/About/About'
 import NotFound from './pages/NotFound/NotFound'
-import Admin from './pages/Admin/admin'
+import Admin from './pages/Admin/Admin'
 import Setup from './pages/Setup/Setup'
 
 function App() {

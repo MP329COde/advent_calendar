@@ -6,6 +6,11 @@
   padding: 3rem 1rem;
   min-height: 100vh;
   overflow: hidden;
+  /* Le wizard impose son propre thème clair, indépendant du thème
+     système/navigateur : sans ça, les contrôles de formulaire (input,
+     select) héritent du rendu natif sombre en dark mode alors que la
+     carte reste blanche, ce qui casse le contraste. */
+  color-scheme: light;
 }
 
 .setup__card {
@@ -14,10 +19,23 @@
   width: 100%;
   max-width: 560px;
   background: #fff;
+  color: #111827;
   border-radius: 20px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
   padding: 2rem;
   animation: setup-card-in 0.5s ease both;
+}
+
+/* Les titres/paragraphes globaux utilisent des tokens de couleur qui
+   s'inversent en dark mode (texte clair) : on les fige ici, la carte
+   du wizard restant blanche quel que soit le thème système. */
+.setup__card h1,
+.setup__card h2 {
+  color: #111827;
+}
+
+.setup__card p {
+  color: #374151;
 }
 
 @keyframes setup-card-in {
@@ -220,7 +238,18 @@
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 1rem;
+  background: #fff;
+  color: #111827;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.setup__form input::placeholder {
+  color: #9ca3af;
+}
+
+.setup__form select option {
+  background: #fff;
+  color: #111827;
 }
 
 .setup__form input:focus,
