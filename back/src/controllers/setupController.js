@@ -240,7 +240,7 @@ export function completeSetup(req, res) {
       }
     }
 
-    db.prepare(`
+    const { changes } = db.prepare(`
       UPDATE setup
       SET is_completed = 1,
           current_step = 1,
@@ -250,8 +250,12 @@ export function completeSetup(req, res) {
           timezone = ?,
           completed_at = CURRENT_TIMESTAMP,
           updated_at = CURRENT_TIMESTAMP
-      WHERE id = 1
+      WHERE id = 1 AND is_completed = 0
     `).run(platformName.trim(), organizationName.trim(), language, timezone);
+
+    if (changes !== 1) {
+      throw new Error('SETUP_ALREADY_COMPLETED');
+    }
 
     return userId;
   });
@@ -259,6 +263,9 @@ export function completeSetup(req, res) {
   try {
     runSetup();
   } catch (error) {
+    if (error.message === 'SETUP_ALREADY_COMPLETED') {
+      return res.status(409).json({ error: 'La configuration a déjà été effectuée' });
+    }
     console.error('[setupController] Erreur lors de la configuration initiale :', error);
     return res.status(500).json({ error: 'Impossible de finaliser la configuration' });
   }
