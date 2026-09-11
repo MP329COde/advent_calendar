@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { markDayOpened } from '../../utils/progress'
 import './DayModal.css'
 
 function DayModal({ day, onClose }) {
@@ -14,7 +15,10 @@ function DayModal({ day, onClose }) {
         return res.json()
       })
       .then((data) => {
-        if (!cancelled) setContent(data)
+        if (!cancelled) {
+          setContent(data)
+          markDayOpened(day)
+        }
       })
       .catch((err) => {
         if (!cancelled) setError(err.message)

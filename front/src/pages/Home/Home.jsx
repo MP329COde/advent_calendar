@@ -4,6 +4,7 @@ import { useTheme } from '../../theme/useTheme'
 import PageMusicPlayer from '../../theme/PageMusicPlayer'
 import { shuffleArray } from '../../utils/shuffle'
 import { buildRemindersIcs } from '../../utils/ics'
+import { getOpenedDays, computeStreak } from '../../utils/progress'
 import DayModal from './DayModal'
 import './Home.css'
 
@@ -49,7 +50,9 @@ function Home() {
   const [days, setDays] = useState([])
   const [error, setError] = useState(null)
   const [selectedDay, setSelectedDay] = useState(null)
+  const [openedDays, setOpenedDays] = useState(() => getOpenedDays())
   const cols = useColumnCount()
+  const streak = computeStreak(openedDays)
 
   useEffect(() => {
     let cancelled = false
@@ -120,14 +123,23 @@ function Home() {
           décembre pour découvrir le mini-projet à relever.
         </p>
         {days.length > 0 && (
-          <button
-            type="button"
-            className="home__reminders-btn"
-            data-testid="download-reminders"
-            onClick={downloadReminders}
-          >
-            📅 Ajouter les rappels au calendrier
-          </button>
+          <div className="home__hero-actions">
+            <button
+              type="button"
+              className="home__reminders-btn"
+              data-testid="download-reminders"
+              onClick={downloadReminders}
+            >
+              📅 Ajouter les rappels au calendrier
+            </button>
+
+            {openedDays.length > 0 && (
+              <div className="home__progress" data-testid="progress-badge">
+                <span>🎁 {openedDays.length}/24 cases ouvertes</span>
+                {streak > 1 && <span>🔥 Série de {streak} jours</span>}
+              </div>
+            )}
+          </div>
         )}
       </section>
 
@@ -166,7 +178,13 @@ function Home() {
       </section>
 
       {selectedDay && (
-        <DayModal day={selectedDay} onClose={() => setSelectedDay(null)} />
+        <DayModal
+          day={selectedDay}
+          onClose={() => {
+            setSelectedDay(null)
+            setOpenedDays(getOpenedDays())
+          }}
+        />
       )}
     </div>
   )

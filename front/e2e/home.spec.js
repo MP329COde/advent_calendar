@@ -92,6 +92,8 @@ test.describe('Ouverture d\'une case débloquée', () => {
 
     await page.getByRole('button', { name: 'Fermer' }).click();
     await expect(modal).not.toBeVisible();
+
+    await expect(page.getByTestId('progress-badge')).toContainText('1/24 cases ouvertes');
   });
 
   test('propose le téléchargement des rappels au format ICS', async ({ page }) => {
