@@ -40,17 +40,29 @@ function DayQuiz({ day, question }) {
         </button>
       </div>
       {result === 'correct' && (
-        <p className="day-modal__quiz-feedback day-modal__quiz-feedback--ok" data-testid="quiz-feedback">
+        <p
+          role="status"
+          className="day-modal__quiz-feedback day-modal__quiz-feedback--ok"
+          data-testid="quiz-feedback"
+        >
           ✅ Bonne réponse !
         </p>
       )}
       {result === 'incorrect' && (
-        <p className="day-modal__quiz-feedback day-modal__quiz-feedback--ko" data-testid="quiz-feedback">
+        <p
+          role="status"
+          className="day-modal__quiz-feedback day-modal__quiz-feedback--ko"
+          data-testid="quiz-feedback"
+        >
           ❌ Pas tout à fait, réessayez !
         </p>
       )}
       {result === 'error' && (
-        <p className="day-modal__quiz-feedback day-modal__quiz-feedback--ko" data-testid="quiz-feedback">
+        <p
+          role="status"
+          className="day-modal__quiz-feedback day-modal__quiz-feedback--ko"
+          data-testid="quiz-feedback"
+        >
           Impossible de vérifier la réponse pour le moment.
         </p>
       )}
