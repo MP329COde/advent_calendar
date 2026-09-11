@@ -84,6 +84,10 @@ export function getDays(req, res) {
       return {
         day: row.day_number,
         unlocked,
+        // La date de déverrouillage n'est pas un secret (seul le contenu
+        // l'est) : l'exposer permet au client de proposer des rappels
+        // ("ajouter au calendrier") sans attendre l'ouverture de la case.
+        unlockDate: row.unlock_date,
         title: unlocked ? row.title : null,
         description: unlocked ? row.description : null,
         imageUrl: unlocked ? settings.imageUrl ?? null : null,

@@ -94,6 +94,27 @@ test.describe('Ouverture d\'une case débloquée', () => {
     await expect(modal).not.toBeVisible();
   });
 
+  test('propose le téléchargement des rappels au format ICS', async ({ page }) => {
+    await page.route('**/api/days', async (route) => {
+      const days = Array.from({ length: 24 }, (_, i) => ({
+        day: i + 1,
+        unlocked: false,
+        unlockDate: `2026-12-${String(i + 1).padStart(2, '0')}`,
+        title: null,
+        description: null,
+        imageUrl: null,
+        audioUrl: null,
+      }));
+      await route.fulfill({ json: days });
+    });
+
+    await page.goto('/');
+    const downloadPromise = page.waitForEvent('download');
+    await page.getByTestId('download-reminders').click();
+    const download = await downloadPromise;
+    expect(download.suggestedFilename()).toBe('calendrier-avent-rappels.ics');
+  });
+
   test('affiche le lien externe et le code promo quand ils sont configurés', async ({ page }) => {
     await page.route('**/api/days', async (route) => {
       const days = Array.from({ length: 24 }, (_, i) => {

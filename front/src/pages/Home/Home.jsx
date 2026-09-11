@@ -3,6 +3,7 @@ import useDocumentTitle from '../../hooks/useDocumentTitle'
 import { useTheme } from '../../theme/useTheme'
 import PageMusicPlayer from '../../theme/PageMusicPlayer'
 import { shuffleArray } from '../../utils/shuffle'
+import { buildRemindersIcs } from '../../utils/ics'
 import DayModal from './DayModal'
 import './Home.css'
 
@@ -96,6 +97,19 @@ function Home() {
     setSelectedDay(day)
   }
 
+  function downloadReminders() {
+    const ics = buildRemindersIcs(days)
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'calendrier-avent-rappels.ics'
+    document.body.appendChild(link)
+    link.click()
+    link.remove()
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="home">
       <PageMusicPlayer pageKey="home" />
@@ -105,6 +119,16 @@ function Home() {
           Un défi, une surprise par jour : ouvrez la case du jour du 1er au 24
           décembre pour découvrir le mini-projet à relever.
         </p>
+        {days.length > 0 && (
+          <button
+            type="button"
+            className="home__reminders-btn"
+            data-testid="download-reminders"
+            onClick={downloadReminders}
+          >
+            📅 Ajouter les rappels au calendrier
+          </button>
+        )}
       </section>
 
       {error && (
