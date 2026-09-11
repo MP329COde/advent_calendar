@@ -132,6 +132,26 @@ function DaysManager() {
             </label>
 
             <label>
+              Question du quiz
+              <input
+                type="text"
+                placeholder="Combien de rennes tire le traîneau du Père Noël ?"
+                value={day.quizQuestion ?? ''}
+                onChange={(event) => updateDay(day.id, { quizQuestion: event.target.value || null })}
+              />
+            </label>
+
+            <label>
+              Réponse attendue
+              <input
+                type="text"
+                placeholder="9"
+                value={day.quizAnswer ?? ''}
+                onChange={(event) => updateDay(day.id, { quizAnswer: event.target.value || null })}
+              />
+            </label>
+
+            <label>
               Image de la case
               <input
                 type="file"

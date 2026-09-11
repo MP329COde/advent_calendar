@@ -117,6 +117,39 @@ test.describe('Ouverture d\'une case débloquée', () => {
     expect(download.suggestedFilename()).toBe('calendrier-avent-rappels.ics');
   });
 
+  test('propose un quiz et affiche le retour du serveur', async ({ page }) => {
+    await page.route('**/api/days', async (route) => {
+      const days = Array.from({ length: 24 }, (_, i) => ({ day: i + 1, unlocked: i === 0 }));
+      await route.fulfill({ json: days });
+    });
+    await page.route('**/api/days/1', async (route) => {
+      await route.fulfill({
+        json: {
+          day: 1,
+          unlocked: true,
+          title: 'Jour quiz',
+          quizQuestion: 'Combien de rennes tire le traîneau ?',
+        },
+      });
+    });
+    await page.route('**/api/days/1/quiz', async (route) => {
+      const body = route.request().postDataJSON();
+      await route.fulfill({ json: { correct: body.answer === '9' } });
+    });
+
+    await page.goto('/');
+    await page.getByTestId('day-card').and(page.locator('[data-unlocked="true"]')).click();
+
+    await expect(page.getByTestId('day-modal-quiz')).toBeVisible();
+    await page.getByLabel('Réponse au quiz').fill('8');
+    await page.getByRole('button', { name: 'Vérifier' }).click();
+    await expect(page.getByTestId('quiz-feedback')).toContainText('Pas tout à fait');
+
+    await page.getByLabel('Réponse au quiz').fill('9');
+    await page.getByRole('button', { name: 'Vérifier' }).click();
+    await expect(page.getByTestId('quiz-feedback')).toContainText('Bonne réponse');
+  });
+
   test('affiche le lien externe et le code promo quand ils sont configurés', async ({ page }) => {
     await page.route('**/api/days', async (route) => {
       const days = Array.from({ length: 24 }, (_, i) => {

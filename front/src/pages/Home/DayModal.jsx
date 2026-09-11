@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { markDayOpened } from '../../utils/progress'
+import DayQuiz from './DayQuiz'
 import './DayModal.css'
 
 function DayModal({ day, onClose }) {
@@ -102,6 +103,8 @@ function DayModal({ day, onClose }) {
                 Code promo : <code>{content.promoCode}</code>
               </p>
             )}
+
+            {content.quizQuestion && <DayQuiz day={content.day} question={content.quizQuestion} />}
           </div>
         )}
       </div>

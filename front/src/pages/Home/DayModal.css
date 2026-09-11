@@ -93,6 +93,59 @@
   letter-spacing: 0.05em;
 }
 
+.day-modal__quiz {
+  margin-top: var(--space-md);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-container);
+}
+
+.day-modal__quiz-question {
+  margin: 0 0 var(--space-sm);
+  font-weight: 600;
+}
+
+.day-modal__quiz-row {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.day-modal__quiz-row input {
+  flex: 1;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-outline, rgba(255, 255, 255, 0.2));
+  font: inherit;
+}
+
+.day-modal__quiz-row button {
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-on-primary, #fff);
+  cursor: pointer;
+  font: inherit;
+}
+
+.day-modal__quiz-row button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.day-modal__quiz-feedback {
+  margin: var(--space-xs) 0 0;
+  font-weight: 600;
+}
+
+.day-modal__quiz-feedback--ok {
+  color: #2ecc71;
+}
+
+.day-modal__quiz-feedback--ko {
+  color: var(--color-error, #c0392b);
+}
+
 @keyframes day-modal-fade {
   from {
     opacity: 0;

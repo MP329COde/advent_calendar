@@ -94,6 +94,9 @@ export function getDays(req, res) {
         audioUrl: unlocked ? settings.audioUrl ?? null : null,
         linkUrl: unlocked ? settings.linkUrl ?? null : null,
         promoCode: unlocked ? settings.promoCode ?? null : null,
+        // La réponse (quizAnswer) n'est jamais renvoyée au client : la
+        // vérification passe par POST /days/:day/quiz côté serveur.
+        quizQuestion: unlocked ? settings.quizQuestion ?? null : null,
       };
     });
 
@@ -173,6 +176,7 @@ export function getDay(req, res) {
       audioUrl: settings.audioUrl ?? null,
       linkUrl: settings.linkUrl ?? null,
       promoCode: settings.promoCode ?? null,
+      quizQuestion: settings.quizQuestion ?? null,
     });
   } catch (error) {
     console.error('[daysController] Erreur lors de la récupération du jour :', error);
@@ -180,5 +184,66 @@ export function getDay(req, res) {
     return res.status(500).json({
       error: 'Impossible de récupérer le jour',
     });
+  }
+}
+
+/**
+ * Vérifie la réponse à la question du quiz d'une case, côté serveur, pour
+ * ne jamais exposer `quizAnswer` au client (contrairement à quizQuestion,
+ * renvoyé en clair par getDay/getDays une fois la case débloquée).
+ *
+ * POST /days/:day/quiz  Body: { answer: string }
+ */
+export function checkQuizAnswer(req, res) {
+  try {
+    const day = Number(req.params.day);
+
+    if (!Number.isInteger(day) || day < 1 || day > 24) {
+      return res.status(400).json({ error: 'Jour invalide' });
+    }
+
+    const { answer } = req.body ?? {};
+
+    if (typeof answer !== 'string') {
+      return res.status(400).json({ error: 'Réponse invalide' });
+    }
+
+    const row = db
+      .prepare(`
+        SELECT day_number, unlock_date, unlock_time, settings
+        FROM calendar_days
+        WHERE calendar_id = (
+          SELECT id
+          FROM calendars
+          WHERE slug = ?
+          LIMIT 1
+        )
+        AND day_number = ?
+        LIMIT 1
+      `)
+      .get('noel-2026', day);
+
+    if (!row) {
+      return res.status(404).json({ error: 'Jour introuvable' });
+    }
+
+    if (!isDayUnlocked(row)) {
+      return res.status(403).json({ error: "Ce jour n'est pas encore débloqué" });
+    }
+
+    const settings = parseSettings(row.settings);
+    const expected = typeof settings.quizAnswer === 'string' ? settings.quizAnswer : null;
+
+    if (!expected) {
+      return res.status(404).json({ error: 'Aucun quiz configuré pour cette case' });
+    }
+
+    const correct = answer.trim().toLowerCase() === expected.trim().toLowerCase();
+
+    return res.json({ correct });
+  } catch (error) {
+    console.error('[daysController] Erreur lors de la vérification du quiz :', error);
+
+    return res.status(500).json({ error: 'Impossible de vérifier la réponse' });
   }
 }

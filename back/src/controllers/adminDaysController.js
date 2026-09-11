@@ -24,6 +24,8 @@ function serializeDay(row) {
     audioUrl: settings.audioUrl ?? null,
     linkUrl: settings.linkUrl ?? null,
     promoCode: settings.promoCode ?? null,
+    quizQuestion: settings.quizQuestion ?? null,
+    quizAnswer: settings.quizAnswer ?? null,
   };
 }
 
@@ -36,7 +38,7 @@ export function listAdminDays(req, res) {
 
   const rows = db
     .prepare(`
-      SELECT id, day_number, title, description, unlock_date, is_enabled, settings
+      SELECT id, day_number, title, description, unlock_date, unlock_time, is_enabled, settings
       FROM calendar_days
       WHERE calendar_id = ?
       ORDER BY day_number ASC
@@ -64,6 +66,8 @@ export function updateAdminDay(req, res) {
     audioUrl,
     linkUrl,
     promoCode,
+    quizQuestion,
+    quizAnswer,
   } = req.body ?? {};
 
   const currentSettings = parseSettings(day.settings);
@@ -72,8 +76,19 @@ export function updateAdminDay(req, res) {
   if (typeof audioUrl === 'string' || audioUrl === null) nextSettings.audioUrl = audioUrl || undefined;
   if (typeof linkUrl === 'string' || linkUrl === null) nextSettings.linkUrl = linkUrl || undefined;
   if (typeof promoCode === 'string' || promoCode === null) nextSettings.promoCode = promoCode || undefined;
+  if (typeof quizQuestion === 'string' || quizQuestion === null) {
+    nextSettings.quizQuestion = quizQuestion || undefined;
+  }
+  if (typeof quizAnswer === 'string' || quizAnswer === null) {
+    nextSettings.quizAnswer = quizAnswer || undefined;
+  }
   const settingsChanged =
-    imageUrl !== undefined || audioUrl !== undefined || linkUrl !== undefined || promoCode !== undefined;
+    imageUrl !== undefined ||
+    audioUrl !== undefined ||
+    linkUrl !== undefined ||
+    promoCode !== undefined ||
+    quizQuestion !== undefined ||
+    quizAnswer !== undefined;
 
   db.prepare(`
     UPDATE calendar_days
