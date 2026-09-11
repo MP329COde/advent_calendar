@@ -7,6 +7,7 @@ import BrandingManager from './sections/BrandingManager'
 import FeatureFlagsManager from './sections/FeatureFlagsManager'
 import UsersManager from './sections/UsersManager'
 import DaysManager from './sections/DaysManager'
+import AnalyticsManager from './sections/AnalyticsManager'
 
 const TABS = [
   { key: 'branding', label: 'Identité', icon: '🎨' },
@@ -14,6 +15,7 @@ const TABS = [
   { key: 'days', label: 'Calendrier', icon: '📅' },
   { key: 'features', label: 'Fonctionnalités', icon: '⚙️' },
   { key: 'users', label: 'Utilisateurs', icon: '👥' },
+  { key: 'analytics', label: 'Statistiques', icon: '📊' },
 ]
 
 function AdminDashboard() {
@@ -59,6 +61,7 @@ function AdminDashboard() {
             {activeTab === 'days' && <DaysManager />}
             {activeTab === 'features' && <FeatureFlagsManager />}
             {activeTab === 'users' && <UsersManager />}
+            {activeTab === 'analytics' && <AnalyticsManager />}
           </div>
         </div>
       )}

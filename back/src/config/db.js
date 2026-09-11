@@ -564,6 +564,13 @@ db.exec(`
       ON DELETE SET NULL
   );
 
+  CREATE TABLE IF NOT EXISTS analytics_events (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    event_type TEXT NOT NULL,
+    day_number INTEGER,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
   COMMIT;
 `);
 
@@ -1354,6 +1361,9 @@ db.exec(`
 
   CREATE INDEX IF NOT EXISTS idx_notifications_unread
     ON notifications(user_id, is_read);
+
+  CREATE INDEX IF NOT EXISTS idx_analytics_events_day
+    ON analytics_events(day_number, event_type);
 
   CREATE INDEX IF NOT EXISTS idx_backups_organization
     ON backups(organization_id);

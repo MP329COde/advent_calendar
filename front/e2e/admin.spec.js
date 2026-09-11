@@ -118,6 +118,24 @@ test.describe('Tableau de bord administrateur', () => {
     await page.getByRole('button', { name: /Utilisateurs/ }).click();
     await expect(page.getByRole('cell', { name: ADMIN_EMAIL })).toBeVisible();
   });
+
+  test('affiche les statistiques de participation agrégées par jour', async ({ page }) => {
+    runSql(`
+      DELETE FROM analytics_events WHERE day_number = 1;
+      INSERT INTO analytics_events (event_type, day_number) VALUES ('day_opened', 1);
+      INSERT INTO analytics_events (event_type, day_number) VALUES ('day_opened', 1);
+      INSERT INTO analytics_events (event_type, day_number) VALUES ('quiz_correct', 1);
+    `);
+
+    await page.getByRole('button', { name: /Statistiques/ }).click();
+    await expect(page.getByTestId('analytics-totals')).toBeVisible();
+    await expect(page.getByTestId('analytics-table')).toBeVisible();
+
+    const dayRow = page
+      .locator('tbody tr')
+      .filter({ has: page.locator('td', { hasText: /^1$/ }) });
+    await expect(dayRow).toContainText('2');
+  });
 });
 
 test.describe('Accès restreint pour un compte non-administrateur', () => {

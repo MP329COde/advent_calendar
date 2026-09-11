@@ -10,6 +10,22 @@ function parseSettings(raw) {
 }
 
 /**
+ * Journal d'analytics anonyme (aucune IP, aucun user-agent, aucun
+ * identifiant de visiteur) : uniquement le type d'événement, le jour
+ * concerné et l'horodatage, pour un décompte agrégé côté admin.
+ */
+function logAnalyticsEvent(eventType, dayNumber) {
+  try {
+    db.prepare('INSERT INTO analytics_events (event_type, day_number) VALUES (?, ?)').run(
+      eventType,
+      dayNumber
+    );
+  } catch (error) {
+    console.error('[daysController] Erreur lors de la journalisation analytics :', error);
+  }
+}
+
+/**
  * Vérifie si un jour du calendrier est débloqué, en se basant sur les
  * colonnes `unlock_date` (YYYY-MM-DD) et `unlock_time` (HH:MM) stockées en
  * base, comparées à l'heure serveur exprimée en UTC. C'est la source de
@@ -167,6 +183,8 @@ export function getDay(req, res) {
 
     const settings = parseSettings(row.settings);
 
+    logAnalyticsEvent('day_opened', row.day_number);
+
     return res.json({
       day: row.day_number,
       unlocked: true,
@@ -239,6 +257,8 @@ export function checkQuizAnswer(req, res) {
     }
 
     const correct = answer.trim().toLowerCase() === expected.trim().toLowerCase();
+
+    logAnalyticsEvent(correct ? 'quiz_correct' : 'quiz_incorrect', row.day_number);
 
     return res.json({ correct });
   } catch (error) {

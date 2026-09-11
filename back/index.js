@@ -12,6 +12,7 @@ import mediaRouter from './src/routes/media.js';
 import adminUsersRouter from './src/routes/adminUsers.js';
 import featureFlagsRouter from './src/routes/featureFlags.js';
 import adminDaysRouter from './src/routes/adminDays.js';
+import adminAnalyticsRouter from './src/routes/adminAnalytics.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -33,6 +34,7 @@ app.use('/api/media', mediaRouter);
 app.use('/api/admin/users', adminUsersRouter);
 app.use('/api/admin/features', featureFlagsRouter);
 app.use('/api/admin/days', adminDaysRouter);
+app.use('/api/admin/analytics', adminAnalyticsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server back démarré sur http://localhost:${PORT}`);
