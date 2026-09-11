@@ -94,6 +94,44 @@ function DaysManager() {
             </label>
 
             <label>
+              Date de déverrouillage
+              <input
+                type="date"
+                value={day.unlockDate ?? ''}
+                onChange={(event) => updateDay(day.id, { unlockDate: event.target.value })}
+              />
+            </label>
+
+            <label>
+              Heure de déverrouillage (UTC)
+              <input
+                type="time"
+                value={day.unlockTime ?? '00:00'}
+                onChange={(event) => updateDay(day.id, { unlockTime: event.target.value })}
+              />
+            </label>
+
+            <label>
+              Lien externe
+              <input
+                type="url"
+                placeholder="https://…"
+                value={day.linkUrl ?? ''}
+                onChange={(event) => updateDay(day.id, { linkUrl: event.target.value || null })}
+              />
+            </label>
+
+            <label>
+              Code promo
+              <input
+                type="text"
+                placeholder="NOEL2026"
+                value={day.promoCode ?? ''}
+                onChange={(event) => updateDay(day.id, { promoCode: event.target.value || null })}
+              />
+            </label>
+
+            <label>
               Image de la case
               <input
                 type="file"

@@ -10,30 +10,40 @@ function parseSettings(raw) {
 }
 
 /**
- * Vérifie si un jour du calendrier est débloqué.
+ * Vérifie si un jour du calendrier est débloqué, en se basant sur les
+ * colonnes `unlock_date` (YYYY-MM-DD) et `unlock_time` (HH:MM) stockées en
+ * base, comparées à l'heure serveur exprimée en UTC. C'est la source de
+ * vérité (source unique, non falsifiable côté client) : on ne fait jamais
+ * confiance à l'horloge du navigateur.
  *
- * Règle actuelle :
- * - les jours sont accessibles uniquement en décembre ;
- * - le jour N est accessible à partir du 1er décembre pour le jour 1,
- *   du 2 décembre pour le jour 2, etc.
+ * Si `unlock_date` est absente (ligne non initialisée), on retombe sur
+ * l'ancienne règle calendaire "jour N = 1er décembre + (N-1) jours" pour ne
+ * pas casser une base non migrée, mais calculée dynamiquement sur l'année
+ * courante plutôt que codée en dur sur 2026.
  *
- * Exemple :
- * - 1er décembre → jour 1 débloqué
- * - 10 décembre → jours 1 à 10 débloqués
- * - 1er novembre → aucun jour débloqué
- *
- * @param {number} dayNumber Numéro du jour du calendrier
- * @param {Date} now Date courante
+ * @param {{unlock_date?: string, unlock_time?: string, day_number: number}} row
+ * @param {Date} now Date courante (UTC)
  * @returns {boolean} true si le jour est débloqué
  */
-function isDayUnlocked(dayNumber, now = new Date()) {
-  const isDecember = now.getMonth() === 11;
+function isDayUnlocked(row, now = new Date()) {
+  const nowMs = now.getTime();
+
+  if (row.unlock_date) {
+    const time = /^\d{2}:\d{2}$/.test(row.unlock_time || '') ? row.unlock_time : '00:00';
+    const unlockMs = Date.parse(`${row.unlock_date}T${time}:00Z`);
+
+    if (!Number.isNaN(unlockMs)) {
+      return nowMs >= unlockMs;
+    }
+  }
+
+  const isDecember = now.getUTCMonth() === 11;
 
   if (!isDecember) {
     return false;
   }
 
-  return dayNumber <= now.getDate();
+  return row.day_number <= now.getUTCDate();
 }
 
 /**
@@ -51,6 +61,8 @@ export function getDays(req, res) {
           day_number,
           title,
           description,
+          unlock_date,
+          unlock_time,
           settings
         FROM calendar_days
         WHERE calendar_id = (
@@ -66,7 +78,7 @@ export function getDays(req, res) {
     const now = new Date();
 
     const days = rows.map((row) => {
-      const unlocked = isDayUnlocked(row.day_number, now);
+      const unlocked = isDayUnlocked(row, now);
       const settings = parseSettings(row.settings);
 
       return {
@@ -76,6 +88,8 @@ export function getDays(req, res) {
         description: unlocked ? row.description : null,
         imageUrl: unlocked ? settings.imageUrl ?? null : null,
         audioUrl: unlocked ? settings.audioUrl ?? null : null,
+        linkUrl: unlocked ? settings.linkUrl ?? null : null,
+        promoCode: unlocked ? settings.promoCode ?? null : null,
       };
     });
 
@@ -115,6 +129,8 @@ export function getDay(req, res) {
           day_number,
           title,
           description,
+          unlock_date,
+          unlock_time,
           settings
         FROM calendar_days
         WHERE calendar_id = (
@@ -134,7 +150,7 @@ export function getDay(req, res) {
       });
     }
 
-    const unlocked = isDayUnlocked(row.day_number);
+    const unlocked = isDayUnlocked(row);
 
     if (!unlocked) {
       return res.status(403).json({
@@ -151,6 +167,8 @@ export function getDay(req, res) {
       description: row.description,
       imageUrl: settings.imageUrl ?? null,
       audioUrl: settings.audioUrl ?? null,
+      linkUrl: settings.linkUrl ?? null,
+      promoCode: settings.promoCode ?? null,
     });
   } catch (error) {
     console.error('[daysController] Erreur lors de la récupération du jour :', error);

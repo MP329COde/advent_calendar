@@ -94,6 +94,47 @@ test.describe('Ouverture d\'une case débloquée', () => {
     await expect(modal).not.toBeVisible();
   });
 
+  test('affiche le lien externe et le code promo quand ils sont configurés', async ({ page }) => {
+    await page.route('**/api/days', async (route) => {
+      const days = Array.from({ length: 24 }, (_, i) => {
+        const day = i + 1;
+        const unlocked = day === 1;
+        return {
+          day,
+          unlocked,
+          title: unlocked ? 'Jour promo' : null,
+          description: null,
+          imageUrl: null,
+          audioUrl: null,
+          linkUrl: unlocked ? 'https://example.com/promo' : null,
+          promoCode: unlocked ? 'NOEL2026' : null,
+        };
+      });
+      await route.fulfill({ json: days });
+    });
+
+    await page.route('**/api/days/1', async (route) => {
+      await route.fulfill({
+        json: {
+          day: 1,
+          unlocked: true,
+          title: 'Jour promo',
+          description: null,
+          imageUrl: null,
+          audioUrl: null,
+          linkUrl: 'https://example.com/promo',
+          promoCode: 'NOEL2026',
+        },
+      });
+    });
+
+    await page.goto('/');
+    await page.getByTestId('day-card').and(page.locator('[data-unlocked="true"]')).click();
+
+    await expect(page.getByTestId('day-modal-link')).toHaveAttribute('href', 'https://example.com/promo');
+    await expect(page.getByTestId('day-modal-promo')).toContainText('NOEL2026');
+  });
+
   test('une case verrouillée ne peut pas être ouverte', async ({ page }) => {
     await page.goto('/');
     const lockedCard = page.getByTestId('day-card').and(page.locator('[data-unlocked="false"]')).first();

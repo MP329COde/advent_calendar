@@ -18,9 +18,12 @@ function serializeDay(row) {
     title: row.title,
     description: row.description,
     unlockDate: row.unlock_date,
+    unlockTime: row.unlock_time,
     isEnabled: Boolean(row.is_enabled),
     imageUrl: settings.imageUrl ?? null,
     audioUrl: settings.audioUrl ?? null,
+    linkUrl: settings.linkUrl ?? null,
+    promoCode: settings.promoCode ?? null,
   };
 }
 
@@ -51,19 +54,33 @@ export function updateAdminDay(req, res) {
     return res.status(404).json({ error: 'Jour introuvable' });
   }
 
-  const { title, description, unlockDate, isEnabled, imageUrl, audioUrl } = req.body ?? {};
+  const {
+    title,
+    description,
+    unlockDate,
+    unlockTime,
+    isEnabled,
+    imageUrl,
+    audioUrl,
+    linkUrl,
+    promoCode,
+  } = req.body ?? {};
 
   const currentSettings = parseSettings(day.settings);
   const nextSettings = { ...currentSettings };
   if (typeof imageUrl === 'string' || imageUrl === null) nextSettings.imageUrl = imageUrl || undefined;
   if (typeof audioUrl === 'string' || audioUrl === null) nextSettings.audioUrl = audioUrl || undefined;
-  const settingsChanged = imageUrl !== undefined || audioUrl !== undefined;
+  if (typeof linkUrl === 'string' || linkUrl === null) nextSettings.linkUrl = linkUrl || undefined;
+  if (typeof promoCode === 'string' || promoCode === null) nextSettings.promoCode = promoCode || undefined;
+  const settingsChanged =
+    imageUrl !== undefined || audioUrl !== undefined || linkUrl !== undefined || promoCode !== undefined;
 
   db.prepare(`
     UPDATE calendar_days
     SET title = COALESCE(?, title),
         description = COALESCE(?, description),
         unlock_date = COALESCE(?, unlock_date),
+        unlock_time = COALESCE(?, unlock_time),
         is_enabled = COALESCE(?, is_enabled),
         settings = COALESCE(?, settings),
         updated_at = CURRENT_TIMESTAMP
@@ -72,6 +89,7 @@ export function updateAdminDay(req, res) {
     typeof title === 'string' ? title : null,
     typeof description === 'string' ? description : null,
     typeof unlockDate === 'string' ? unlockDate : null,
+    typeof unlockTime === 'string' ? unlockTime : null,
     typeof isEnabled === 'boolean' ? (isEnabled ? 1 : 0) : null,
     settingsChanged ? JSON.stringify(nextSettings) : null,
     id

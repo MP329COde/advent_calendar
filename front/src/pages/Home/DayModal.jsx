@@ -80,6 +80,24 @@ function DayModal({ day, onClose }) {
                 data-testid="day-modal-audio"
               />
             )}
+
+            {content.linkUrl && (
+              <a
+                className="day-modal__link"
+                href={content.linkUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-testid="day-modal-link"
+              >
+                Découvrir →
+              </a>
+            )}
+
+            {content.promoCode && (
+              <p className="day-modal__promo" data-testid="day-modal-promo">
+                Code promo : <code>{content.promoCode}</code>
+              </p>
+            )}
           </div>
         )}
       </div>
