@@ -136,6 +136,37 @@ test.describe('Tableau de bord administrateur', () => {
       .filter({ has: page.locator('td', { hasText: /^1$/ }) });
     await expect(dayRow).toContainText('2');
   });
+
+  test('affiche une notification dans la cloche pour l’administrateur connecté', async ({
+    page,
+  }) => {
+    const adminId = execFileSync('sqlite3', [
+      DB_PATH,
+      `SELECT id FROM users WHERE email = '${ADMIN_EMAIL}';`,
+    ])
+      .toString()
+      .trim();
+
+    runSql(`
+      DELETE FROM notifications WHERE user_id = ${adminId};
+      INSERT INTO notifications (user_id, type, title, message)
+        VALUES (${adminId}, 'day_unlock', 'Case 1 débloquée 🎄', 'Test e2e de la cloche de notifications.');
+    `);
+
+    await page.reload();
+
+    const trigger = page.getByTestId('notification-bell-trigger');
+    await expect(trigger).toBeVisible();
+    await expect(page.getByTestId('notification-bell-badge')).toHaveText('1');
+
+    await trigger.click();
+    const panel = page.getByTestId('notification-bell-panel');
+    await expect(panel).toBeVisible();
+    await expect(panel).toContainText('Test e2e de la cloche de notifications.');
+
+    await panel.getByText('Test e2e de la cloche de notifications.').click();
+    await expect(page.getByTestId('notification-bell-badge')).not.toBeVisible();
+  });
 });
 
 test.describe('Accès restreint pour un compte non-administrateur', () => {

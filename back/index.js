@@ -13,6 +13,8 @@ import adminUsersRouter from './src/routes/adminUsers.js';
 import featureFlagsRouter from './src/routes/featureFlags.js';
 import adminDaysRouter from './src/routes/adminDays.js';
 import adminAnalyticsRouter from './src/routes/adminAnalytics.js';
+import notificationsRouter from './src/routes/notifications.js';
+import { checkAndCreateUnlockNotifications } from './src/controllers/notificationsController.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -35,7 +37,14 @@ app.use('/api/admin/users', adminUsersRouter);
 app.use('/api/admin/features', featureFlagsRouter);
 app.use('/api/admin/days', adminDaysRouter);
 app.use('/api/admin/analytics', adminAnalyticsRouter);
+app.use('/api/notifications', notificationsRouter);
 
 app.listen(PORT, () => {
   console.log(`Server back démarré sur http://localhost:${PORT}`);
+
+  // Vérifie périodiquement les cases fraîchement débloquées pour créer des
+  // notifications en base (pas de dépendance à un service d'e-mail/push
+  // tiers : c'est un centre de notifications interne à l'application).
+  checkAndCreateUnlockNotifications();
+  setInterval(checkAndCreateUnlockNotifications, 60_000);
 });

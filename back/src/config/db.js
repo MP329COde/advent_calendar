@@ -530,6 +530,16 @@ db.exec(`
       ON DELETE CASCADE
   );
 
+  CREATE TABLE IF NOT EXISTS notified_unlocks (
+    calendar_id INTEGER NOT NULL,
+    day_number INTEGER NOT NULL,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (calendar_id, day_number),
+    FOREIGN KEY (calendar_id)
+      REFERENCES calendars(id)
+      ON DELETE CASCADE
+  );
+
   CREATE TABLE IF NOT EXISTS backups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     organization_id INTEGER,

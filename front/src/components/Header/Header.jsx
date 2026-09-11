@@ -1,7 +1,11 @@
 import { NavLink } from 'react-router-dom'
+import { useAuth } from '../../auth/useAuth'
+import NotificationBell from './NotificationBell'
 import './Header.css'
 
 function Header() {
+  const { user } = useAuth()
+
   return (
     <header className="site-header">
       <nav className="site-header__nav" aria-label="Navigation principale">
@@ -23,6 +27,7 @@ function Header() {
           À propos
         </NavLink>
       </nav>
+      {user && <NotificationBell />}
     </header>
   )
 }
