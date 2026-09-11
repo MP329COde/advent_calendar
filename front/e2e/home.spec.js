@@ -33,6 +33,26 @@ test.describe('Page d\'accueil', () => {
       page.getByRole('heading', { name: 'Page introuvable' })
     ).toBeVisible();
   });
+
+  test('bascule l’interface en anglais via le sélecteur de langue', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: "Calendrier de l'Avent" })
+    ).toBeVisible();
+
+    await page.getByTestId('language-select').selectOption('en');
+
+    await expect(
+      page.getByRole('heading', { name: 'Advent Calendar' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'View the project on GitHub' })
+    ).toBeVisible();
+
+    await page.reload();
+    await expect(
+      page.getByRole('heading', { name: 'Advent Calendar' })
+    ).toBeVisible();
+  });
 });
 
 test.describe('Ouverture d\'une case débloquée', () => {

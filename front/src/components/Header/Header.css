@@ -25,6 +25,22 @@
   gap: var(--space-md);
 }
 
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.site-header__lang {
+  font-family: var(--font-body);
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
 .site-header__link {
   color: var(--text);
   text-decoration: none;

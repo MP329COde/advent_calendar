@@ -1,0 +1,62 @@
+{
+  "header": {
+    "home": "Home",
+    "about": "About"
+  },
+  "footer": {
+    "copyright": "© {{year}} Advent Calendar — one challenge a day, from December 1st to 24th.",
+    "githubLink": "View the project on GitHub"
+  },
+  "home": {
+    "title": "Advent Calendar",
+    "subtitle": "One challenge, one surprise a day: open today's door between December 1st and 24th to discover the mini-project waiting for you.",
+    "downloadReminders": "📅 Add reminders to my calendar",
+    "progress": "🎁 {{count}}/24 doors opened",
+    "streak": "🔥 {{count}}-day streak",
+    "loadError": "Error while loading the calendar",
+    "gridLabel": "Calendar doors",
+    "dayUnlocked": "Day {{day}}, unlocked{{titleSuffix}}",
+    "dayLocked": "Day {{day}}, locked"
+  },
+  "dayModal": {
+    "ariaLabel": "Content for day {{day}}",
+    "close": "Close",
+    "loadError": "This door could not be opened",
+    "loading": "Opening the door…",
+    "day": "Day {{day}}",
+    "defaultTitle": "Day {{day}}",
+    "discover": "Discover →",
+    "promoCode": "Promo code:"
+  },
+  "dayQuiz": {
+    "placeholder": "Your answer…",
+    "answerLabel": "Quiz answer",
+    "check": "Check",
+    "correct": "✅ Correct answer!",
+    "incorrect": "❌ Not quite, try again!",
+    "error": "Unable to check the answer right now."
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "This page doesn't exist, or no longer does.",
+    "backHome": "Back to home"
+  },
+  "about": {
+    "title": "About this calendar",
+    "description": "Every day from December 1st to 24th, a new door unlocks and reveals a mini-project to complete. One challenge a day, to have fun and make progress until Christmas.",
+    "backHome": "Back to calendar"
+  },
+  "login": {
+    "title": "Administrator login",
+    "hint": "Access the dashboard to manage your calendar.",
+    "email": "Email",
+    "password": "Password",
+    "submitting": "Signing in…",
+    "submit": "Sign in"
+  },
+  "language": {
+    "label": "Language",
+    "fr": "Français",
+    "en": "English"
+  }
+}

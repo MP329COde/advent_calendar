@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import useDocumentTitle from '../../hooks/useDocumentTitle'
 import { useTheme } from '../../theme/useTheme'
 import PageMusicPlayer from '../../theme/PageMusicPlayer'
@@ -44,6 +45,7 @@ function mosaicStyle(index, cols, rows, imageUrl) {
 }
 
 function Home() {
+  const { t } = useTranslation()
   useDocumentTitle()
   const { theme } = useTheme() ?? {}
 
@@ -59,7 +61,7 @@ function Home() {
 
     fetch('/api/days')
       .then((res) => {
-        if (!res.ok) throw new Error('Erreur lors du chargement du calendrier')
+        if (!res.ok) throw new Error(t('home.loadError'))
         return res.json()
       })
       .then((data) => {
@@ -117,11 +119,8 @@ function Home() {
     <div className="home">
       <PageMusicPlayer pageKey="home" />
       <section className="home__hero">
-        <h1 className="text-display-hero">Calendrier de l&apos;Avent</h1>
-        <p className="text-body-lg">
-          Un défi, une surprise par jour : ouvrez la case du jour du 1er au 24
-          décembre pour découvrir le mini-projet à relever.
-        </p>
+        <h1 className="text-display-hero">{t('home.title')}</h1>
+        <p className="text-body-lg">{t('home.subtitle')}</p>
         {days.length > 0 && (
           <div className="home__hero-actions">
             <button
@@ -130,13 +129,13 @@ function Home() {
               data-testid="download-reminders"
               onClick={downloadReminders}
             >
-              📅 Ajouter les rappels au calendrier
+              {t('home.downloadReminders')}
             </button>
 
             {openedDays.length > 0 && (
               <div className="home__progress" data-testid="progress-badge">
-                <span>🎁 {openedDays.length}/24 cases ouvertes</span>
-                {streak > 1 && <span>🔥 Série de {streak} jours</span>}
+                <span>{t('home.progress', { count: openedDays.length })}</span>
+                {streak > 1 && <span>{t('home.streak', { count: streak })}</span>}
               </div>
             )}
           </div>
@@ -149,7 +148,7 @@ function Home() {
         </p>
       )}
 
-      <section className="home__grid" aria-label="Cases du calendrier">
+      <section className="home__grid" aria-label={t('home.gridLabel')}>
         {orderedDays.map(({ day, unlocked, title }, index) => (
           <button
             key={day}
@@ -163,8 +162,8 @@ function Home() {
             data-unlocked={unlocked}
             aria-label={
               unlocked
-                ? `Jour ${day}, débloqué${title ? `, ${title}` : ''}`
-                : `Jour ${day}, verrouillé`
+                ? t('home.dayUnlocked', { day, titleSuffix: title ? `, ${title}` : '' })
+                : t('home.dayLocked', { day })
             }
           >
             <span className="text-calendar-number">{day}</span>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { markDayOpened } from '../../utils/progress'
 import DayQuiz from './DayQuiz'
 import './DayModal.css'
 
 function DayModal({ day, onClose }) {
+  const { t } = useTranslation()
   const [content, setContent] = useState(null)
   const [error, setError] = useState(null)
 
@@ -12,7 +14,7 @@ function DayModal({ day, onClose }) {
 
     fetch(`/api/days/${day}`)
       .then((res) => {
-        if (!res.ok) throw new Error("Cette case n'a pas pu être ouverte")
+        if (!res.ok) throw new Error(t('dayModal.loadError'))
         return res.json()
       })
       .then((data) => {
@@ -44,11 +46,16 @@ function DayModal({ day, onClose }) {
         className="day-modal"
         role="dialog"
         aria-modal="true"
-        aria-label={`Contenu du jour ${day}`}
+        aria-label={t('dayModal.ariaLabel', { day })}
         data-testid="day-modal"
         onClick={(event) => event.stopPropagation()}
       >
-        <button type="button" className="day-modal__close" onClick={onClose} aria-label="Fermer">
+        <button
+          type="button"
+          className="day-modal__close"
+          onClick={onClose}
+          aria-label={t('dayModal.close')}
+        >
           ✕
         </button>
 
@@ -58,12 +65,12 @@ function DayModal({ day, onClose }) {
           </p>
         )}
 
-        {!error && !content && <p className="day-modal__loading">Ouverture de la case…</p>}
+        {!error && !content && <p className="day-modal__loading">{t('dayModal.loading')}</p>}
 
         {content && (
           <div className="day-modal__content" data-testid="day-modal-content">
-            <span className="day-modal__day">Jour {content.day}</span>
-            <h2>{content.title || `Case ${content.day}`}</h2>
+            <span className="day-modal__day">{t('dayModal.day', { day: content.day })}</span>
+            <h2>{content.title || t('dayModal.defaultTitle', { day: content.day })}</h2>
 
             {content.imageUrl && (
               <img
@@ -94,13 +101,13 @@ function DayModal({ day, onClose }) {
                 rel="noopener noreferrer"
                 data-testid="day-modal-link"
               >
-                Découvrir →
+                {t('dayModal.discover')}
               </a>
             )}
 
             {content.promoCode && (
               <p className="day-modal__promo" data-testid="day-modal-promo">
-                Code promo : <code>{content.promoCode}</code>
+                {t('dayModal.promoCode')} <code>{content.promoCode}</code>
               </p>
             )}
 

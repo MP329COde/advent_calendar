@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/useAuth'
 import './Login.css'
 
 function Login({ onSuccess }) {
+  const { t } = useTranslation()
   const { login } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -30,8 +32,8 @@ function Login({ onSuccess }) {
         <div className="login__icon" aria-hidden="true">
           🔐
         </div>
-        <h1>Connexion administrateur</h1>
-        <p className="login__hint">Accédez au tableau de bord pour gérer votre calendrier.</p>
+        <h1>{t('login.title')}</h1>
+        <p className="login__hint">{t('login.hint')}</p>
 
         {error && (
           <p className="login__error" role="alert">
@@ -40,7 +42,7 @@ function Login({ onSuccess }) {
         )}
 
         <label className="login__field">
-          Email
+          {t('login.email')}
           <input
             type="email"
             name="email"
@@ -52,7 +54,7 @@ function Login({ onSuccess }) {
         </label>
 
         <label className="login__field">
-          Mot de passe
+          {t('login.password')}
           <input
             type="password"
             name="password"
@@ -64,7 +66,7 @@ function Login({ onSuccess }) {
         </label>
 
         <button type="submit" className="login__submit" disabled={submitting}>
-          {submitting ? 'Connexion…' : 'Se connecter'}
+          {submitting ? t('login.submitting') : t('login.submit')}
         </button>
       </form>
     </div>

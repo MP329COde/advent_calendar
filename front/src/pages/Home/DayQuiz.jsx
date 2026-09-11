@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 function DayQuiz({ day, question }) {
+  const { t } = useTranslation()
   const [answer, setAnswer] = useState('')
   const [result, setResult] = useState(null)
   const [checking, setChecking] = useState(false)
@@ -32,11 +34,11 @@ function DayQuiz({ day, question }) {
           type="text"
           value={answer}
           onChange={(event) => setAnswer(event.target.value)}
-          placeholder="Votre réponse…"
-          aria-label="Réponse au quiz"
+          placeholder={t('dayQuiz.placeholder')}
+          aria-label={t('dayQuiz.answerLabel')}
         />
         <button type="submit" disabled={checking || !answer.trim()}>
-          Vérifier
+          {t('dayQuiz.check')}
         </button>
       </div>
       {result === 'correct' && (
@@ -45,7 +47,7 @@ function DayQuiz({ day, question }) {
           className="day-modal__quiz-feedback day-modal__quiz-feedback--ok"
           data-testid="quiz-feedback"
         >
-          ✅ Bonne réponse !
+          {t('dayQuiz.correct')}
         </p>
       )}
       {result === 'incorrect' && (
@@ -54,7 +56,7 @@ function DayQuiz({ day, question }) {
           className="day-modal__quiz-feedback day-modal__quiz-feedback--ko"
           data-testid="quiz-feedback"
         >
-          ❌ Pas tout à fait, réessayez !
+          {t('dayQuiz.incorrect')}
         </p>
       )}
       {result === 'error' && (
@@ -63,7 +65,7 @@ function DayQuiz({ day, question }) {
           className="day-modal__quiz-feedback day-modal__quiz-feedback--ko"
           data-testid="quiz-feedback"
         >
-          Impossible de vérifier la réponse pour le moment.
+          {t('dayQuiz.error')}
         </p>
       )}
     </form>

@@ -1,0 +1,62 @@
+{
+  "header": {
+    "home": "Accueil",
+    "about": "À propos"
+  },
+  "footer": {
+    "copyright": "© {{year}} Calendrier de l'Avent — un défi par jour, du 1er au 24 décembre.",
+    "githubLink": "Voir le projet sur GitHub"
+  },
+  "home": {
+    "title": "Calendrier de l'Avent",
+    "subtitle": "Un défi, une surprise par jour : ouvrez la case du jour du 1er au 24 décembre pour découvrir le mini-projet à relever.",
+    "downloadReminders": "📅 Ajouter les rappels au calendrier",
+    "progress": "🎁 {{count}}/24 cases ouvertes",
+    "streak": "🔥 Série de {{count}} jours",
+    "loadError": "Erreur lors du chargement du calendrier",
+    "gridLabel": "Cases du calendrier",
+    "dayUnlocked": "Jour {{day}}, débloqué{{titleSuffix}}",
+    "dayLocked": "Jour {{day}}, verrouillé"
+  },
+  "dayModal": {
+    "ariaLabel": "Contenu du jour {{day}}",
+    "close": "Fermer",
+    "loadError": "Cette case n'a pas pu être ouverte",
+    "loading": "Ouverture de la case…",
+    "day": "Jour {{day}}",
+    "defaultTitle": "Case {{day}}",
+    "discover": "Découvrir →",
+    "promoCode": "Code promo :"
+  },
+  "dayQuiz": {
+    "placeholder": "Votre réponse…",
+    "answerLabel": "Réponse au quiz",
+    "check": "Vérifier",
+    "correct": "✅ Bonne réponse !",
+    "incorrect": "❌ Pas tout à fait, réessayez !",
+    "error": "Impossible de vérifier la réponse pour le moment."
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "message": "Cette page n'existe pas, ou plus.",
+    "backHome": "Retour à l'accueil"
+  },
+  "about": {
+    "title": "À propos du calendrier",
+    "description": "Chaque jour du 1er au 24 décembre, une nouvelle case se débloque et révèle un mini-projet à réaliser. Un défi par jour, pour progresser en s'amusant jusqu'à Noël.",
+    "backHome": "Retour au calendrier"
+  },
+  "login": {
+    "title": "Connexion administrateur",
+    "hint": "Accédez au tableau de bord pour gérer votre calendrier.",
+    "email": "Email",
+    "password": "Mot de passe",
+    "submitting": "Connexion…",
+    "submit": "Se connecter"
+  },
+  "language": {
+    "label": "Langue",
+    "fr": "Français",
+    "en": "English"
+  }
+}
