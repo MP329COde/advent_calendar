@@ -12,8 +12,8 @@ importers:
         specifier: ^3.0.3
         version: 3.0.3
       better-sqlite3:
-        specifier: ^13.0.3
-        version: 13.0.3
+        specifier: ^13.1.1
+        version: 13.1.1
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -58,8 +58,8 @@ packages:
     resolution: {integrity: sha512-GlF5wPWnSa/X5LKM1o0wz0suXIINz1iHRLvTS+sLyi7XPbe5ycmYI3DlZqVGZZtDgl4DmasFg7gOB3JYbphV5g==}
     hasBin: true
 
-  better-sqlite3@13.0.3:
-    resolution: {integrity: sha512-RbOBxmLBG8uvFUc15X9+9SFemKcQ0WBuISBVkpuiaUB2qblC8UWlHEjdWVoZ8AdhSwmoEgsiXKfopX0CQxaACQ==}
+  better-sqlite3@13.1.1:
+    resolution: {integrity: sha512-JjyLCATp+VLxZVFyWkicyzKYwpEFLCrV4MmshW97xv3JXdhw5jBDcsbEWRGm2L/96E+k7rtjON8q9nml05h3Pw==}
     engines: {node: '>=22'}
 
   binary-extensions@2.3.0:
@@ -530,7 +530,7 @@ snapshots:
 
   bcryptjs@3.0.3: {}
 
-  better-sqlite3@13.0.3:
+  better-sqlite3@13.1.1:
     dependencies:
       node-addon-api: 8.9.2
 
